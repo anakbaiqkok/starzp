@@ -598,5 +598,5 @@ class Bot(BaseClient):
         logger.info(f"🔥 {self.username} Bot Started 🔥")
 
 
-navy = UserBot(name="clients")
+star = UserBot(name="clients")
 bot = Bot()
