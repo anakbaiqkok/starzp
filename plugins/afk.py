@@ -1,4 +1,4 @@
-from clients import navy
+from clients import star
 from command import REP_BLOCK
 from helpers import AFK_, CMD
 
@@ -19,7 +19,7 @@ __HELP__ = """<blockquote>Command Help **AFK**</blockquote>
 IS_BASIC = True
 
 
-@CMD.NO_CMD("REP_BLOCK", navy)
+@CMD.NO_CMD("REP_BLOCK", star)
 async def _(client, message):
     return await REP_BLOCK(client, message)
 
@@ -29,7 +29,7 @@ async def _(client, message):
     return await AFK_.set_afk(client, message)
 
 
-@CMD.NO_CMD("AFK", navy)
+@CMD.NO_CMD("AFK", star)
 async def _(client, message):
     return await AFK_.get_afk(client, message)
 
