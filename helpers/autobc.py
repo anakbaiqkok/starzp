@@ -6,7 +6,7 @@ from datetime import datetime
 
 from pyrogram.errors import FloodPremiumWait, FloodWait, UserBannedInChannel
 
-from clients import bot, navy
+from clients import bot, star
 from config import BLACKLIST_GCAST
 from database import dB
 from logs import logger
@@ -173,7 +173,7 @@ async def sending_message(client):
 async def AutoBC():
     logger.info("✅ AutoBC tasks started")
     while True:
-        for client in navy._ubot:
+        for client in star._ubot:
             if (
                 await dB.get_var(client.me.id, "AUTOBC")
                 and client.me.id not in AUTOBC_STATUS
@@ -203,7 +203,7 @@ from typing import Dict, Set
 
 from pyrogram.errors import FloodPremiumWait, FloodWait, UserBannedInChannel
 
-from clients import bot, navy
+from clients import bot, star
 from config import BLACKLIST_GCAST
 from database import dB
 from logs import logger
@@ -472,7 +472,7 @@ async def AutoBC():
                         await auto_bc_queue.put((client_id, client))
                     del waiting_clients[client_id]
 
-            for client in navy._ubot:
+            for client in star._ubot:
                 client_id = client.me.id
 
                 if client_id in AUTOBC_STATUS or client_id in waiting_clients:
