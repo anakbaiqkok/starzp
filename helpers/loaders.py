@@ -9,7 +9,7 @@ from pyrogram import enums
 from pyrogram.helpers import kb
 from pytz import timezone
 
-from clients import bot, navy
+from clients import bot, star
 from config import (BOT_ID, BOT_NAME, IS_JASA_PRIVATE, LOG_BACKUP, LOG_SELLER,
                     OWNER_ID)
 from database import DB_PATH, dB
@@ -72,7 +72,7 @@ async def installing_user(client):
 
 async def installPeer():
     try:
-        for client in navy._ubot:
+        for client in star._ubot:
             await installing_user(client)
         await bot.send_message(OWNER_ID, "✅ Sukses Install Data Pengguna.")
     except Exception:
@@ -95,15 +95,15 @@ async def sending_user(user_id):
 
 
 async def stoped_ubot(userid):
-    clients = navy._ubot
+    clients = star._ubot
     for client in clients:
         if client.me.id == userid:
             await dB.remove_ubot(client.me.id)
             await dB.rem_expired_date(client.me.id)
             await dB.remove_var(client.me.id, "plan")
             await dB.revoke_token(client.me.id, deleted=True)
-            navy._get_my_id.remove(client.me.id)
-            navy._ubot.remove(client)
+            star._get_my_id.remove(client.me.id)
+            star._ubot.remove(client)
             try:
                 await client.stop()
                 await asyncio.sleep(2)
@@ -173,7 +173,7 @@ async def CheckUsers():
     while True:
         try:
             total = await dB.get_var(BOT_ID, "total_users")
-            current_total = len(navy._ubot)
+            current_total = len(star._ubot)
             if current_total == total:
                 await asyncio.sleep(360)
                 continue
@@ -206,7 +206,7 @@ async def ExpiredSewa():
             if now >= exp:
                 await bot.send_message(
                     OWNER_ID,
-                    "<blockquote><b>Maaf, masa aktif Bot Sewa Private Anda sudah habis!!\nSilahkan kontak @navycode or @kenapasinan untuk memperpanjang masa aktif bot.</b></blockquote>",
+                    "<blockquote><b>Maaf, masa aktif Bot Sewa Private Anda sudah habis!!\nSilahkan kontak @tuhant3l3 or @starxcode untuk memperpanjang masa aktif bot.</b></blockquote>",
                 )
                 await dB.rem_expired_date(BOT_ID)
                 await asyncio.sleep(360)
@@ -229,8 +229,8 @@ async def handle_user_expired(client, msg=None):
     await dB.rem_expired_date(client.me.id)
     await dB.revoke_token(client.me.id, deleted=True)
 
-    navy._get_my_id.remove(client.me.id)
-    navy._ubot.remove(client)
+    star._get_my_id.remove(client.me.id)
+    star._ubot.remove(client)
 
     await client.stop()
     await asyncio.sleep(2)
@@ -243,7 +243,7 @@ async def handle_user_expired(client, msg=None):
 async def ExpiredUser():
     logger.info("✅ ExpiredUser task started.")
     while True:
-        for client in navy._ubot.copy():
+        for client in star._ubot.copy():
             try:
                 now = datetime.now(timezone("Asia/Jakarta"))
                 exp = await dB.get_expired_date(client.me.id)
