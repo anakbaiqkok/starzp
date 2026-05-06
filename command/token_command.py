@@ -12,7 +12,7 @@ from pyrogram.types import (KeyboardButton, ReplyKeyboardMarkup,
                             ReplyKeyboardRemove)
 from pytz import timezone
 
-from clients import UserBot, bot, navy
+from clients import UserBot, bot, star
 from config import API_HASH, API_ID, LOG_SELLER, WAJIB_JOIN
 from database import dB
 from helpers import ButtonUtils, Tools, no_trigger, stoped_ubot
@@ -302,7 +302,7 @@ async def tools_token(client, query):
                     disable_web_page_preview=True,
                 )
                 await asyncio.sleep(2)
-                kn_client = UserBot(
+                star_client = UserBot(
                     name=str(user_id),
                     api_id=API_ID,
                     api_hash=API_HASH,
@@ -321,38 +321,38 @@ async def tools_token(client, query):
                 except Exception as e:
                     logger.error(f"Error Client: {str(e)}")
                 await dB.add_ubot(
-                    user_id=int(kn_client.me.id),
+                    user_id=int(star_client.me.id),
                     session_string=session_string,
                 )
-                if not user_id == kn_client.me.id:
-                    navy._ubot.remove(kn_client)
-                    await dB.remove_ubot(kn_client.me.id)
-                    await kn_client.log_out()
+                if not user_id == star_client.me.id:
+                    star._ubot.remove(star_client)
+                    await dB.remove_ubot(star_client.me.id)
+                    await star_client.log_out()
                     return await bot_msg.edit(
                         f"<blockquote><b>Gunakan akun anda sendiri, bukan orang lain!!</b></blockquote>"
                     )
-                await migrate_data(int(oldowner), kn_client.me.id)
+                await migrate_data(int(oldowner), star_client.me.id)
                 await stoped_ubot(int(oldowner))
-                new_token = await dB.generate_token(str(kn_client.me.id))
+                new_token = await dB.generate_token(str(star_client.me.id))
                 await dB.use_token(new_token)
                 await asyncio.sleep(1)
                 for mod in _PLUGINS:
                     importlib.reload(importlib.import_module(f"plugins.{mod}"))
                 for chat in WAJIB_JOIN:
                     try:
-                        await kn_client.join_chat(chat)
+                        await star_client.join_chat(chat)
                     except Exception:
                         pass
-                prefix = navy.get_prefix(kn_client.me.id)
+                prefix = star.get_prefix(star_client.me.id)
                 keyb = ButtonUtils.start_menu(is_admin=False)
-                exp = await dB.get_expired_date(kn_client.me.id)
+                exp = await dB.get_expired_date(star_client.me.id)
                 expir = exp.astimezone(timezone("Asia/Jakarta")).strftime(
                     "%Y-%m-%d %H:%M"
                 )
                 text_done = f"""
 <blockquote expandable><b>🔥 {bot.me.mention} Berhasil Di Aktifkan
-➡️ Akun: <a href=tg://openmessage?user_id={kn_client.me.id}>{kn_client.me.first_name} {kn_client.me.last_name or ''}</a>
-➡️ ID: <code>{kn_client.me.id}</code>
+➡️ Akun: <a href=tg://openmessage?user_id={star_client.me.id}>{star_client.me.first_name} {star_client.me.last_name or ''}</a>
+➡️ ID: <code>{star_client.me.id}</code>
 ➡️ Prefixes: {''.join(prefix)}
 ➡️ Plan: <b>{PLAN}</b>
 ➡️ Token: <code>{new_token}</code>
@@ -369,8 +369,8 @@ Mohon simpan Token kamu dengan aman.</b></blockquote>"""
                     f"""
 <b>❏ Notifikasi Claim Token</b>
 <b>├ Token dari:</b> `{int(oldowner)}`
-<b>├ Akun :</b> <a href=tg://user?id={kn_client.me.id}>{kn_client.me.first_name} {kn_client.me.last_name or ''}</a> 
-<b>├ ID :</b> <code>{kn_client.me.id}</code>
+<b>├ Akun :</b> <a href=tg://user?id={star_client.me.id}>{star_client.me.first_name} {star_client.me.last_name or ''}</a> 
+<b>├ ID :</b> <code>{star_client.me.id}</code>
 <b>╰ User Token :</b> <code>{new_token}</code>
 """,
                     reply_markup=ikb(
@@ -378,7 +378,7 @@ Mohon simpan Token kamu dengan aman.</b></blockquote>"""
                             [
                                 (
                                     "Cek Kadaluarsa",
-                                    f"cek_masa_aktif {kn_client.me.id}",
+                                    f"cek_masa_aktif {star_client.me.id}",
                                     "callback_data",
                                 )
                             ]
@@ -390,7 +390,7 @@ Mohon simpan Token kamu dengan aman.</b></blockquote>"""
                 logger.error(f"ERROR CLAIM TOKEN: {traceback.format_exc()}")
     elif data == "revoke_token":
         buttons = ikb([[("🔙 Back", "starthome")], [("❌ Tutup", "buttonclose")]])
-        if user_id not in navy._get_my_id:
+        if user_id not in star._get_my_id:
             return await query.edit_message_text(
                 "<b>Maaf, kamu bukan pengguna userbot ini dan kamu tidak memiliki token.</b>",
                 reply_markup=buttons,
