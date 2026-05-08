@@ -18,7 +18,7 @@ from typing import Union
 import aiohttp
 import httpx
 import yt_dlp
-from pyrogram.errors import FloodPremiumWait, FloodWait
+from pyrogram.errors import FloodWait
 from pyrogram.types import Voice
 from pytgcalls.types import AudioQuality, MediaStream, VideoQuality
 
@@ -223,7 +223,7 @@ class YoutubeAPI:
             try:
                 await pros.edit(teks_progress)
                 await sleep(2)
-            except (FloodWait, FloodPremiumWait) as e:
+            except FloodWait as e:
                 await sleep(e.value)
                 await self.progress(current, total, pros, mulai, operasi, nama_file)
 
