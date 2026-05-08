@@ -84,7 +84,7 @@ async def safe_send_message(selected_msg, chat_id, watermark=None):
         await asyncio.sleep(0.1)
         return True
 
-    except FloodWaitas e:
+    except FloodWaitas as e:
         await asyncio.sleep(e.value)
         return await safe_send_message(selected_msg, chat_id, watermark)
     except UserBannedInChannel:
