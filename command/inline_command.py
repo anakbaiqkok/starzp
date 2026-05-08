@@ -1431,7 +1431,7 @@ async def alive_inline(result, inline_query):
     upnya = await get_time((time() - start_time))
     me = next((x for x in star._ubot), None)
     try:
-        peer = navy._get_my_peer[self]
+        peer = star._get_my_peer[self]
         users = len(peer["private"])
         group = len(peer["group"])
     except Exception:
