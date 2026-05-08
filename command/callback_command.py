@@ -672,7 +672,7 @@ async def get_font(_, callback_query):
 async def prev_font(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
 
     try:
@@ -719,7 +719,7 @@ async def next_font(_, callback_query):
 async def refresh_cat(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     uniq = str(callback_query.data.split("_")[2])
     await callback_query.answer("Please wait a minute", True)
