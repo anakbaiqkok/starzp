@@ -5,7 +5,7 @@ from helpers.buttons import nokos
 
 
 async def cb_shop(_, callback: CallbackQuery):
-    text, button = await Paginates.nokos(0)
+    text, button = await Buttonutils.nokos(0)
     return await callback.edit_message_text(
           text, reply_markup=button
     )
@@ -13,7 +13,7 @@ async def cb_shop(_, callback: CallbackQuery):
 
 async def cb_page_shop(_, callback: CallbackQuery):
     page = int(callback.matches[0].group(1))
-    text, button = await Paginates.nokos(page)
+    text, button = await Buttonutils.nokos(page)
     return await callback.edit_message_text(
           text, reply_markup=button
     ) 
