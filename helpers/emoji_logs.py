@@ -3,8 +3,9 @@ import random
 import traceback
 
 from pyrogram import enums
-from pyrogram.errors import (ChatSendPlainForbidden, MessageIdInvalid,
-                             SlowmodeWait, TopicClosed)
+from pyrogram.errors import (ChatWriteForbidden, MessageIdInvalid,
+                             SlowmodeWait, TopicClosed, FloodWait)
+from pyrogram import enums
 
 from config import BOT_NAME
 from database import dB
@@ -23,7 +24,7 @@ async def animate_proses(message, proses):
             )
         else:
             msg = await message.reply(f"{proses}**Please wait...**")
-    except (ChatSendPlainForbidden, MessageIdInvalid):
+    except (ChatWriteForbidden, MessageIdInvalid):
         return None
     except TopicClosed:
         return None
@@ -42,7 +43,7 @@ async def animate_proses(message, proses):
 async def animate_proses(message, proses):
     try:
         msg = await message.reply(f"{proses}**Please wait...**")
-    except ChatSendPlainForbidden:
+    except ChatWriteForbidden:
         return await message.delete()
     stages = [
         f"{proses}**▰▰▱▱▱▱▱**",
@@ -56,7 +57,7 @@ async def animate_proses(message, proses):
             await asyncio.sleep(0.2)
             await msg.edit(stage)
         return msg
-    except (ChatSendPlainForbidden, MessageIdInvalid):
+    except (ChatWriteForbidden, MessageIdInvalid):
         return await message.delete()
 """
 
