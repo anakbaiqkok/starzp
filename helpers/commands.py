@@ -1,7 +1,7 @@
 import asyncio
 
 from pyrogram import enums, filters
-from pyrogram.errors import FloodPremiumWait, FloodWait
+from pyrogram.errors import FloodWait
 from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent
 
 from clients import bot, star
@@ -91,7 +91,7 @@ class CMD:
         async def wrapper(*args, **kwargs):
             try:
                 return await func(*args, **kwargs)
-            except (FloodWait, FloodPremiumWait) as e:
+            except FloodWait as e:
                 await asyncio.sleep(e.value)
                 return await func(*args, **kwargs)
 
