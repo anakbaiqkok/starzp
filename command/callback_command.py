@@ -638,7 +638,7 @@ async def cb_notes(_, callback_query):
                         caption=teks, reply_markup=button
                     )
 
-            except (FloodWait, FloodPremiumWait) as e:
+            except FloodWait as e:
                 return await callback_query.answer(
                     f"FloodWait {e}, Please Waiting!!", True
                 )
