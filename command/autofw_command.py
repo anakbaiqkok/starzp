@@ -28,7 +28,7 @@ async def autofw_cmd(client, message):
     if type == "on":
         if not status_autofw:
             return await msg.edit(
-                f"{em.gagal}**Please add link before setting it on!!**\n**Example:** `{message.text.split()[0]} add https://t.me/kynansupport/1884`"
+                f"{em.gagal}**Please add link before setting it on!!**\n**Example:** `{message.text.split()[0]} add https://t.me/quotedamn/1884`"
             )
         if await dB.get_var(client.me.id, "AUTOFW"):
             return await msg.edit(f"{em.gagal}<b>Auto forward already turned on.</b>")
@@ -47,13 +47,13 @@ async def autofw_cmd(client, message):
             target, messageids = Tools.get_link(value)
         except TypeError:
             return await msg.edit(
-                f"{em.gagal}**Please give me valid link.\nExample: `{message.text.split()[0]} add https://t.me/kynansupport/1884`**",
+                f"{em.gagal}**Please give me valid link.\nExample: `{message.text.split()[0]} add https://t.me/quotedamn/1884`**",
                 disable_web_page_preview=True,
             )
         args = await client.get_messages(target, messageids)
         if args.empty == True:
             return await msg.edit(
-                f"{em.gagal}**Please give me valid link.\nExample: `{message.text.split()[0]} add https://t.me/kynansupport/1884`**",
+                f"{em.gagal}**Please give me valid link.\nExample: `{message.text.split()[0]} add https://t.me/quotedamn/1884`**",
                 disable_web_page_preview=True,
             )
         await dB.set_var(client.me.id, "AUTOFW_GCAST_TEXT", value)
