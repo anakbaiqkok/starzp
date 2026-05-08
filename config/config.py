@@ -56,6 +56,8 @@ API_MAELYN = os.environ.get("API_MAELYN", "kenapanan")
 
 BOT_NAME = os.environ.get("BOT_NAME", "NDABLEX COMMUNITY")
 
+MONGO_DB_URI = getenv("MONGO_DB_URI", None)
+
 DB_NAME = os.environ.get("DB_NAME", "ndablex_bot")
 
 URL_LOGO = os.environ.get("URL_LOGO", "https://envs.sh/kaX.jpg")
