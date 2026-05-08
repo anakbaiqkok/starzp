@@ -1,3 +1,4 @@
+"""
 from pyrogram import filters
 from pyrogram.types import CallbackQuery
 from pyrogram.handlers import CallbackQueryHandler
@@ -27,5 +28,6 @@ Handlers.command["bot"].update({
         cb_page_shop, filters.regex(r"^list_nokos_(\d+)")
     ) 
 })
+"""
 
 
