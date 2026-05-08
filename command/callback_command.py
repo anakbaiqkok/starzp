@@ -16,7 +16,7 @@ from pyrogram.types import (InlineKeyboardMarkup, InputMediaAnimation,
 from pyrogram.utils import unpack_inline_message_id
 from pytz import timezone
 
-from clients import bot, navy
+from clients import bot,star
 from config import (API_MAELYN, BOT_NAME, COPY_ID, HELPABLE, LOG_SELLER,
                     SUDO_OWNERS, USENAME_OWNER)
 from database import dB, state
@@ -201,7 +201,7 @@ async def cb_help(_, callback_query):
                 if not data["is_pro"] and not data["is_basic"]
             }
             plan_teks = "Lite"
-    prefix = navy.get_prefix(user_id)
+    prefix = star.get_prefix(user_id)
     x_ = next(iter(prefix))
     full = f"<a href=tg://user?id={callback_query.from_user.id}>{callback_query.from_user.first_name} {callback_query.from_user.last_name or ''}</a>"
     cekpic = await dB.get_var(user_id, "HELP_LOGO")
@@ -374,7 +374,7 @@ async def del_userbot(_, callback_query):
     except Exception:
         get_id = int(callback_query.data.split()[1])
         get_mention = f"<a href=tg://user?id={get_id}>Userbot</a>"
-    for X in navy._ubot:
+    for X in star._ubot:
         if get_id == X.me.id:
             try:
                 await X.unblock_user(bot.me.username)
@@ -387,8 +387,8 @@ async def del_userbot(_, callback_query):
             await dB.remove_ubot(X.me.id)
             await dB.rem_expired_date(X.me.id)
             await dB.revoke_token(X.me.id, deleted=True)
-            navy._get_my_id.remove(X.me.id)
-            navy._ubot.remove(X)
+            star._get_my_id.remove(X.me.id)
+            star._ubot.remove(X)
             await X.log_out()
             return await bot.send_message(
                 LOG_SELLER,
@@ -401,19 +401,19 @@ async def prevnext_userbot(_, callback_query):
     query = callback_query.data.split()
     count = int(query[1])
     if query[0] == "next_ub":
-        if count == len(navy._ubot) - 1:
+        if count == len(star._ubot) - 1:
             count = 0
         else:
             count += 1
     elif query[0] == "prev_ub":
         if count == 0:
-            count = len(navy._ubot) - 1
+            count = len(star._ubot) - 1
         else:
             count -= 1
     try:
         return await callback_query.edit_message_text(
             await Message.userbot(count),
-            reply_markup=(ButtonUtils.userbot(navy._ubot[count].me.id, count)),
+            reply_markup=(ButtonUtils.userbot(star._ubot[count].me.id, count)),
         )
     except Exception as e:
         return f"Error: {e}"
@@ -424,19 +424,19 @@ async def prevnext_userbot2(_, callback_query):
     query = callback_query.data.split()
     count = int(query[1])
     if query[0] == "fakenext_ub":
-        if count == len(navy._ubot) - 1:
+        if count == len(star._ubot) - 1:
             count = 0
         else:
             count += 1
     elif query[0] == "fakeprev_ub":
         if count == 0:
-            count = len(navy._ubot) - 1
+            count = len(star._ubot) - 1
         else:
             count -= 1
     try:
         return await callback_query.edit_message_text(
             await Message.userbot(count),
-            reply_markup=(ButtonUtils.fake_userbot(navy._ubot[count].me.id, count)),
+            reply_markup=(ButtonUtils.fake_userbot(star._ubot[count].me.id, count)),
         )
     except Exception as e:
         return f"Error: {e}"
@@ -451,7 +451,7 @@ async def tools_userbot(_, callback_query):
             f"<b>GAUSAH REWEL YA ANJING! {callback_query.from_user.first_name} {callback_query.from_user.last_name or ''}",
             True,
         )
-    X = navy._ubot[int(query[1])]
+    X = star._ubot[int(query[1])]
     if query[0] == "get_otp":
         async for otp in X.search_messages(777000, limit=1):
             try:
@@ -591,7 +591,7 @@ async def cb_notes(_, callback_query):
     try:
         notetag = data[-2].replace("cb_", "")
         gw = data[-1]
-        item = [x for x in navy._ubot if int(gw) == x.me.id]
+        item = [x for x in star._ubot if int(gw) == x.me.id]
         noteval = await dB.get_var(int(gw), notetag, "notes")
 
         if not noteval:
@@ -654,7 +654,7 @@ async def cb_notes(_, callback_query):
 async def get_font(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     try:
         data = str(callback_query.data.split()[1])
@@ -696,7 +696,7 @@ async def prev_font(_, callback_query):
 async def next_font(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     try:
         get_id = str(callback_query.data.split()[1])
@@ -753,7 +753,7 @@ async def refresh_cat(_, callback_query):
 async def bola_date(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
 
     split = callback_query.data.split()
@@ -794,7 +794,7 @@ async def bola_date(_, callback_query):
 async def bola_matches(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     split = callback_query.data.split()
     if len(split) > 2:
@@ -836,7 +836,7 @@ async def bola_matches(_, callback_query):
 async def rest_anime(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     data = callback_query.data.split("_")
     page = int(data[1])
@@ -880,7 +880,7 @@ async def rest_anime(_, callback_query):
 async def rest_donghua(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     data = callback_query.data.split("_")
     page = int(data[1])
@@ -921,7 +921,7 @@ async def rest_donghua(_, callback_query):
 async def rest_comic(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     data = callback_query.data.split("_")
     page = int(data[1])
@@ -960,7 +960,7 @@ async def rest_comic(_, callback_query):
 async def news_(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     data = callback_query.data.split("_")
     page = int(data[1])
@@ -1067,7 +1067,7 @@ async def chatai_with_chatgpt_normal(_, query, uniq):
 async def chat_gpt(client, query):
     if not query.from_user:
         return await query.answer("ANAK ANJING!!", True)
-    if query.from_user.id not in navy._get_my_id:
+    if query.from_user.id not in star._get_my_id:
         return await query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     mode = str(query.data.split("_")[1])
     uniq = str(query.data.split("_")[2])
@@ -1115,7 +1115,7 @@ async def chat_gpt(client, query):
 async def gpt_voice(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     data = callback_query.data.split("_")
     args = str(data[1])
@@ -1171,7 +1171,7 @@ async def gpt_voice(_, callback_query):
 async def cine_plax(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     data = callback_query.data.split("_")
     uniq = str(data[2])
@@ -1288,7 +1288,7 @@ async def nxt_spotify(_, callback_query):
 async def dl_spot(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     await callback_query.answer("Please wait a minute", True)
     try:
@@ -1362,7 +1362,7 @@ async def dl_spot(_, callback_query):
 async def viewchord(_, callback):
     if not callback.from_user:
         return await callback.answer("ANAK ANJING!!", True)
-    if callback.from_user.id not in navy._get_my_id:
+    if callback.from_user.id not in star._get_my_id:
         return await callback.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     try:
         parts = callback.data.split("_", 2)
@@ -1406,7 +1406,7 @@ async def viewchord(_, callback):
 async def an1cb(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     data = callback_query.data.split("_")
     page = int(data[1])
@@ -1452,7 +1452,7 @@ async def an1cb(_, callback_query):
 async def moddycb(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     data = callback_query.data.split("_")
     page = int(data[1])
@@ -1496,7 +1496,7 @@ async def moddycb(_, callback_query):
 async def viewgempa(_, callback):
     if not callback.from_user:
         return await callback.answer("ANAK ANJING!!", True)
-    if callback.from_user.id not in navy._get_my_id:
+    if callback.from_user.id not in star._get_my_id:
         return await callback.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     _, page, uniq = callback.data.split("_")
     page = int(page)
@@ -1533,7 +1533,7 @@ async def viewgempa(_, callback):
 async def nxtbmkg(_, callback):
     if not callback.from_user:
         return await callback.answer("ANAK ANJING!!", True)
-    if callback.from_user.id not in navy._get_my_id:
+    if callback.from_user.id not in star._get_my_id:
         return await callback.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     _, uniq, idx = callback.data.split("_")
     idx = int(idx)
@@ -1588,7 +1588,7 @@ async def nxtbmkg(_, callback):
 async def nxt_ytsearch(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     data = callback_query.data.split("_")
     await callback_query.answer("Please wait a minute", True)
@@ -1634,7 +1634,7 @@ async def nxt_ytsearch(_, callback_query):
 async def dl_ytsearch(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     await callback_query.answer("Please wait...", True)
     try:
@@ -1732,7 +1732,7 @@ async def dl_ytsearch(_, callback_query):
 async def selected_topic(_, callback_query):
     if not callback_query.from_user:
         return await callback_query.answer("ANAK ANJING!!", True)
-    if callback_query.from_user.id not in navy._get_my_id:
+    if callback_query.from_user.id not in star._get_my_id:
         return await callback_query.answer("GW BUNTUNGIN TANGAN LO YA MEMEK", True)
     data = callback_query.data.split("_")
     chat_id = int(data[1])
