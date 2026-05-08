@@ -729,7 +729,7 @@ async def ADD_ME(client, message):
             if members.id in dbgban:
                 try:
                     await client.ban_chat_member(message.chat.id, members.id)
-                except (FloodWait, FloodPremiumWait) as e:
+                except FloodWait as e:
                     await asyncio.sleep(e.value)
                     await client.ban_chat_member(message.chat.id, members.id)
                 except Exception:
