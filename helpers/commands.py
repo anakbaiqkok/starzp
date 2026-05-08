@@ -4,7 +4,7 @@ from pyrogram import enums, filters
 from pyrogram.errors import FloodPremiumWait, FloodWait
 from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent
 
-from clients import bot, navy
+from clients import bot, star
 from config import (BOT_ID, FAKE_DEVS, IS_JASA_PRIVATE, KYNAN, LOG_SELLER,
                     OWNER_ID, SUDO_OWNERS)
 from database import dB
@@ -81,7 +81,7 @@ class FILTERS:
     PRIVATE = filters.private
     OWNER = filters.user(OWNER_ID)
     FAKE_DEV2 = filters.user(OWNER_ID)
-    DEVELOPER = filters.user(KYNAN) & ~filters.me
+    DEVELOPER = filters.user(STARX) & ~filters.me
     FAKE_DEV = filters.user(FAKE_DEVS) & ~filters.me
 
 
@@ -107,11 +107,11 @@ class CMD:
                     if message.from_user
                     else message.sender_chat.id
                 )
-                if user in KYNAN:
+                if user in STARX:
                     return await func(client, message)
                 if expired_date is None:
                     return await message.reply(
-                        "<blockquote><b>Maaf, masa aktif Bot Sewa Private Anda sudah habis!!\nSilahkan kontak @navycode or @kenapasinan untuk memperpanjang masa aktif bot.</b></blockquote>"
+                        "<blockquote><b>Maaf, masa aktif Bot Sewa Private Anda sudah habis!!\nSilahkan kontak @tuhant3l3 or @starxcode untuk memperpanjang masa aktif bot.</b></blockquote>"
                     )
             return await func(client, message)
 
@@ -149,7 +149,7 @@ class CMD:
             module_is_pro = func.__globals__.get("IS_PRO", None)
             module_is_basic = func.__globals__.get("IS_BASIC", False)
 
-            @navy.on_message(navy.user_prefix(command) & filter)
+            @navy.on_message(star.user_prefix(command) & filter)
             @CMD.FLOOD_HANDLER
             @CMD.EXPIRED
             async def wrapped_func(client, message):
@@ -236,7 +236,7 @@ class CMD:
     def NLX(func):
         async def function(client, message):
             user = message.from_user if message.from_user else message.sender_chat
-            if user.id not in KYNAN:
+            if user.id not in STARX:
                 return
             return await func(client, message)
 
@@ -255,7 +255,7 @@ class CMD:
     @staticmethod
     def DEV_CMD(command, filter=FILTERS.DEVELOPER):
         def wrapper(func):
-            @navy.on_message(filters.command(command, "^") & filter)
+            @star.on_message(filters.command(command, "^") & filter)
             @CMD.FLOOD_HANDLER
             async def wrapped_func(client, message):
                 await func(client, message)
@@ -271,7 +271,7 @@ class CMD:
             module_is_pro = func.__globals__.get("IS_PRO", None)
             module_is_basic = func.__globals__.get("IS_BASIC", False)
 
-            @navy.on_message(filters.command(command, "c") & filter)
+            @star.on_message(filters.command(command, "c") & filter)
             @CMD.FLOOD_HANDLER
             async def wrapped_func(client, message):
                 IGNORE_MODULES = await dB.get_var(client.me.id, "IGNORE_MODULES") or []
@@ -546,7 +546,7 @@ class CMD:
     @staticmethod
     def INLINE_QUERY(func):
         async def wrapper(client, iq):
-            users = navy._get_my_id
+            users = star._get_my_id
             if iq.from_user.id not in users:
                 return await client.answer_inline_query(
                     iq.id,
@@ -569,7 +569,7 @@ class CMD:
     @staticmethod
     def CALLBACK_DATA(func):
         async def wrapper(client, cq):
-            users = navy._get_my_id
+            users = star._get_my_id
             if cq.from_user.id not in users:
                 return await cq.answer(
                     f"Silakan Order Bot @{client.me.username} Agar Bisa Menggunakan Bot Ini",
