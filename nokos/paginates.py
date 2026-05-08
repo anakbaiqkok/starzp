@@ -3,7 +3,7 @@ from pyrogram.types import (
     InlineKeyboardMarkup,
 )
 
-from apps.core import db
+from .mongo import db
 
 
 class Paginates:
