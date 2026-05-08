@@ -353,7 +353,7 @@ class UserBot(BaseClient):
                         await func(client, message)
                     else:
                         func(client, message)
-                except (errors.FloodWait, errors.FloodPremiumWait) as e:
+                except errors.FloodWait as e:
                     logger.warning(f"FloodWait: Sleeping for {e.value} seconds.")
                     await asyncio.sleep(e.value)
                     await func(client, message)
@@ -495,7 +495,7 @@ class Bot(BaseClient):
                         await func(client, message)
                     else:
                         func(client, message)
-                except (errors.FloodWait, errors.FloodPremiumWait) as e:
+                except errors.FloodWait as e:
                     logger.warning(f"FloodWait: Sleeping for {e.value} seconds.")
                     await asyncio.sleep(e.value)
                     await func(client, message)
