@@ -122,28 +122,28 @@ async def start_home(client, message):
                 video=image_start["video"],
                 caption=text,
                 reply_markup=buttons,
-                effect_id=random.choice(Basic_Effect),
+                message_effect_id=random.choice(Basic_Effect),
             )
         elif "animation" in image_start:
             return await message.reply_animation(
                 animation=image_start["animation"],
                 caption=text,
                 reply_markup=buttons,
-                effect_id=random.choice(Basic_Effect),
+                message_effect_id=random.choice(Basic_Effect),
             )
         elif "photo" in image_start:
             return await message.reply_photo(
                 photo=image_start["photo"],
                 caption=text,
                 reply_markup=buttons,
-                effect_id=random.choice(Basic_Effect),
+                message_effect_id=random.choice(Basic_Effect),
             )
     else:
         return await message.reply(
             text=text,
             reply_markup=buttons,
             disable_web_page_preview=True,
-            effect_id=random.choice(Basic_Effect),
+            message_effect_id=random.choice(Basic_Effect),
         )
 
 
