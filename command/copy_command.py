@@ -41,7 +41,7 @@ async def copyall_cmd(client, message):
 
     if len(args) < 2:
         return await message.reply(
-            f"**Please give link**\nExample: `{message.text.split()[0]} https://t.me/quotedamn 5`"
+            f"**Please give link**\nExample: `{message.text.split()[0]} https://t.me/quotedamn/1745 5`"
         )
     proses = await animate_proses(message, em.proses)
     chat_id = message.chat.id
@@ -51,7 +51,7 @@ async def copyall_cmd(client, message):
     chats, links = Tools.get_link(message_link)
     if chats is None or links is None:
         return await proses.edit(
-            f"**Invalid link**\nExample: `{message.text.split()[0]} https://t.me/kynansupport/1745 5`"
+            f"**Invalid link**\nExample: `{message.text.split()[0]} https://t.me/quotedamn/1745 5`"
         )
     try:
         async for msg in client.get_chat_history(chats, limit=1):
@@ -123,7 +123,7 @@ async def copyall2_cmd(client, message):
 
     if len(args) < 2:
         return await message.reply(
-            f"**Please give link**\nExample: `{message.text.split()[0]} https://t.me/kynansupport/1745 5`"
+            f"**Please give link**\nExample: `{message.text.split()[0]} https://t.me/quotedamn/1745 5`"
         )
     proses = await animate_proses(message, em.proses)
     chat_id = message.chat.id
@@ -133,7 +133,7 @@ async def copyall2_cmd(client, message):
     chats, links = Tools.get_link(message_link)
     if chats is None or links is None:
         await proses.edit(
-            f"**Invalid link**\nExample: `{message.text.split()[0]} https://t.me/kynansupport/1745 5`"
+            f"**Invalid link**\nExample: `{message.text.split()[0]} https://t.me/quotedamn/1745 5`"
         )
         return
     try:
