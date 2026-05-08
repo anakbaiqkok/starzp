@@ -489,7 +489,7 @@ async def tools_userbot(_, callback_query):
             reply_markup=(ButtonUtils.deak(X.me.id, int(query[1])))
         )
     elif query[0] == "deak_akun":
-        navy._ubot.remove(X)
+        star._ubot.remove(X)
         await X.invoke(raw.functions.account.DeleteAccount(reason="madarchod hu me"))
         return await callback_query.edit_message_text(
             Message.deak(X),
