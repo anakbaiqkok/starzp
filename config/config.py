@@ -202,8 +202,8 @@ SAWERIA_EMAIL = os.environ.get(
     "SAWERIA_EMAIL",
     None,
 )
-SAWERIA_NAME = os.environ.get(
-    "SAWERIA_NAME",
+SAWERIA_USERNAME = os.environ.get(
+    "SAWERIA_USERNAME",
     None,
 )
 SAWERIA_USERID = os.environ.get(
