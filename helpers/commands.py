@@ -149,7 +149,7 @@ class CMD:
             module_is_pro = func.__globals__.get("IS_PRO", None)
             module_is_basic = func.__globals__.get("IS_BASIC", False)
 
-            @navy.on_message(star.user_prefix(command) & filter)
+            @star.on_message(star.user_prefix(command) & filter)
             @CMD.FLOOD_HANDLER
             @CMD.EXPIRED
             async def wrapped_func(client, message):
@@ -196,7 +196,7 @@ class CMD:
             filter = filters.create(verified_sudo)
 
         def wrapper(func):
-            @navy.on_message(filters.regex(command) & filters.me & filter)
+            @star.on_message(filters.regex(command) & filters.me & filter)
             @CMD.FLOOD_HANDLER
             @CMD.EXPIRED
             async def wrapped_func(client, message):
@@ -210,7 +210,7 @@ class CMD:
     @staticmethod
     def EDITED():
         def wrapper(func):
-            @navy.on_edited_message(
+            @star.on_edited_message(
                 (filters.mentioned & filters.incoming & ~filters.bot & ~filters.via_bot)
                 | (filters.private & filters.incoming & ~filters.bot & ~filters.service)
             )
