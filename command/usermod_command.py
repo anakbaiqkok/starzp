@@ -368,7 +368,7 @@ async def setuname_cmd(client, message):
         return await pros.edit(
             f"{emo.sukses}<b>Successfully changed username to: <code>{uname}</code></b>"
         )
-    except (FloodWait, FloodPremiumWait) as e:
+    except FloodWait as e:
         wait = int(e.value)
         await asyncio.sleep(wait)
         await client.set_username(username=uname)
