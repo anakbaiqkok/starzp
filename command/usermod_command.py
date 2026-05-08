@@ -173,12 +173,12 @@ async def mping_cmd(client, message):
         _ping = f"<b>{em.ping}{pong_}:</b> {ping_result} ms\n"
 
     if message._client.me.is_premium:
-        effect_id = random.choice(Premium_Effect)
+        message_effect_id = random.choice(Premium_Effect)
     else:
-        effect_id = random.choice(Basic_Effect)
+        message_effect_id = random.choice(Basic_Effect)
     await proses.delete()
     if message.chat.type == enums.ChatType.PRIVATE:
-        return await message.reply(_ping, effect_id=effect_id)
+        return await message.reply(_ping, message_effect_id=message_effect_id)
     else:
         return await message.reply(_ping)
 
