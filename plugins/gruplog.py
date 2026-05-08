@@ -1,4 +1,4 @@
-from clients import navy
+from clients import star
 from command import ADD_ME, EDITED, LOGS_GROUP, REPLY, logs_cmd
 from helpers import CMD
 
@@ -22,12 +22,12 @@ async def _(client, message):
     return await logs_cmd(client, message)
 
 
-@CMD.NO_CMD("LOGS_GROUP", navy)
+@CMD.NO_CMD("LOGS_GROUP", star)
 async def _(client, message):
     return await LOGS_GROUP(client, message)
 
 
-@CMD.NO_CMD("REPLY", navy)
+@CMD.NO_CMD("REPLY", star)
 @CMD.IS_LOG
 async def _(client, message):
     return await REPLY(client, message)
@@ -38,6 +38,6 @@ async def _(client, message):
     return await EDITED(client, message)
 
 
-@CMD.NO_CMD("ADD_ME", navy)
+@CMD.NO_CMD("ADD_ME", star)
 async def _(client, message):
     return await ADD_ME(client, message)
