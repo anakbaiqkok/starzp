@@ -23,7 +23,7 @@ from meval import meval
 from pytz import timezone
 
 import config
-from clients import bot, navy
+from clients import bot, star
 from database import DB_PATH, dB, state
 from helpers import (HTML, ButtonUtils, Emoji, Message, Quotly, Saweria,
                      SocialMedia, Spotify, Sticker, Tools, YoutubeSearch,
@@ -130,12 +130,12 @@ async def plugins_cmd(_, message):
 
 async def send_ubot_1(client, message):
     user = message.from_user if message.from_user else message.sender_chat
-    if user.id not in config.KYNAN:
+    if user.id not in config.STARX:
         return
     return await client.send_message(
         message.from_user.id,
         await Message.userbot(0),
-        reply_markup=ButtonUtils.userbot(navy._ubot[0].me.id, 0),
+        reply_markup=ButtonUtils.userbot(star._ubot[0].me.id, 0),
     )
 
 
@@ -146,13 +146,13 @@ async def send_ubot_2(client, message):
     return await client.send_message(
         message.from_user.id,
         await Message.userbot(0),
-        reply_markup=ButtonUtils.fake_userbot(navy._ubot[0].me.id, 0),
+        reply_markup=ButtonUtils.fake_userbot(star._ubot[0].me.id, 0),
     )
 
 
 async def restore(client, message):
     user = message.from_user if message.from_user else message.sender_chat
-    if user.id not in config.KYNAN:
+    if user.id not in config.STARX:
         return
     reply = message.reply_to_message
     if not reply:
@@ -191,7 +191,7 @@ async def restore(client, message):
 
 async def backup(client, message):
     user = message.from_user if message.from_user else message.sender_chat
-    if user.id not in config.KYNAN:
+    if user.id not in config.STARX:
         return
     now = datetime.now(timezone("Asia/Jakarta"))
     timestamp = now.strftime("%Y-%m-%d_%H:%M")
@@ -209,7 +209,7 @@ async def backup(client, message):
 
 async def cb_shell(client, message):
     user = message.from_user if message.from_user else message.sender_chat
-    if user.id not in config.KYNAN:
+    if user.id not in config.STARX:
         return
     if len(message.command) < 2:
         return await message.reply("Noob!!")
@@ -251,7 +251,7 @@ async def cb_shell(client, message):
 
 async def cb_evaluasi_bot(client, message):
     user = message.from_user if message.from_user else message.sender_chat
-    if user.id not in config.KYNAN:
+    if user.id not in config.STARX:
         return
     if len(message.text.split()) == 1:
         await message.reply_text("<b>No Code!</b>", quote=True)
@@ -283,7 +283,7 @@ async def cb_evaluasi_bot(client, message):
             "helpers": pyrogram.helpers,
             # LOCAL
             "bot": bot,
-            "navy": navy,
+            "star": star,
             "dB": dB,
             "Emoji": Emoji,
             "config": config,
@@ -352,7 +352,7 @@ async def cb_evaluasi_bot(client, message):
 
 async def cb_evalusi(client, message):
     user = message.from_user if message.from_user else message.sender_chat
-    if user.id not in config.KYNAN:
+    if user.id not in config.STARX:
         return
     if len(message.text.split()) == 1:
         await message.reply_text("<b>No Code!</b>", quote=True)
@@ -380,7 +380,7 @@ async def cb_evalusi(client, message):
             "helpers": pyrogram.helpers,
             # LOCAL
             "bot": bot,
-            "navy": navy,
+            "star": star,
             "dB": dB,
             "Emoji": Emoji,
             "config": config,
