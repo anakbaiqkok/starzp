@@ -4,7 +4,7 @@ import random
 import traceback
 from datetime import datetime
 
-from pyrogram.errors import FloodPremiumWait, FloodWait, UserBannedInChannel
+from pyrogram.errors import FloodWait, UserBannedInChannel
 
 from clients import bot, star
 from config import BLACKLIST_GCAST
@@ -84,7 +84,7 @@ async def safe_send_message(selected_msg, chat_id, watermark=None):
         await asyncio.sleep(0.1)
         return True
 
-    except (FloodWait, FloodPremiumWait) as e:
+    except FloodWaitas e:
         await asyncio.sleep(e.value)
         return await safe_send_message(selected_msg, chat_id, watermark)
     except UserBannedInChannel:
