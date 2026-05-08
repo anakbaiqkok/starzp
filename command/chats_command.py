@@ -4,8 +4,7 @@ import traceback
 
 from pyrogram import enums, raw
 from pyrogram.enums import ChatMembersFilter
-from pyrogram.errors import (ChatAdminRequired, ChatNotModified,
-                             FloodPremiumWait, FloodWait, PeerFlood,
+from pyrogram.errors import (ChatAdminRequired, ChatNotModified, FloodWait, PeerFlood,
                              PeerIdInvalid, RPCError, UserAlreadyParticipant,
                              UsernameInvalid, UsernameNotOccupied,
                              UserNotMutualContact, UserPrivacyRestricted)
@@ -309,7 +308,7 @@ async def leave_cmd(client, message):
             ):
                 sukses += 1
                 await client.leave_chat(chat)
-        except (FloodWait, FloodPremiumWait) as e:
+        except FloodWait as e:
             await asyncio.sleep(e)
             await client.leave_chat(chat)
             sukses += 1
@@ -409,7 +408,7 @@ async def leave_mute(client):
                 if member.status == enums.ChatMemberStatus.RESTRICTED:
                     sukses += 1
                     await client.leave_chat(dialog.chat.id)
-            except (FloodWait, FloodPremiumWait) as e:
+            except FloodWait as e:
                 await asyncio.sleep(e)
                 await client.leave_chat(dialog.chat.id)
                 sukses += 1
@@ -474,7 +473,7 @@ async def endchat_cmd(client, message):
                 )
             except PeerIdInvalid:
                 continue
-            except (FloodWait, FloodPremiumWait) as e:
+            except FloodWait as e:
                 await asyncio.sleep(e.value)
                 info = await client.resolve_peer(ids)
                 await client.invoke(
@@ -644,7 +643,7 @@ async def invite_cmd(client, message):
             await proses.edit(
                 f"{em.gagal}<b>Failed to invite {user}: User privacy restricted.</b>"
             )
-        except (FloodWait, FloodPremiumWait) as e:
+        except FloodWait as e:
             await asyncio.sleep(e.value)
             await proses.edit(f"{em.uptime}<b>Flood wait for {e.value} seconds.</b>")
             await client.add_chat_members(chat_id, user)
@@ -711,7 +710,7 @@ async def all_cmd(client, message):
                         usertxt,
                         disable_web_page_preview=True,
                     )
-            except (FloodWait, FloodPremiumWait) as e:
+            except FloodWait as e:
                 await asyncio.sleep(e.value)
             finally:
                 task.end_task(task_id)
@@ -745,7 +744,7 @@ async def all_cmd(client, message):
                         f"<b>{text}</b>\n\n{usertxt}",
                         disable_web_page_preview=True,
                     )
-            except (FloodWait, FloodPremiumWait) as e:
+            except FloodWait as e:
                 await asyncio.sleep(e.value)
             finally:
                 task.end_task(task_id)
@@ -801,7 +800,7 @@ async def tagadmins_cmd(client, message):
                     usertxt,
                     disable_web_page_preview=True,
                 )
-        except (FloodWait, FloodPremiumWait) as e:
+        except FloodWait as e:
             await asyncio.sleep(e.value)
         finally:
             task.end_task(task_id)
@@ -836,7 +835,7 @@ async def tagadmins_cmd(client, message):
                     f"<b>{text}</b>\n\n{usertxt}",
                     disable_web_page_preview=True,
                 )
-        except (FloodWait, FloodPremiumWait) as e:
+        except FloodWait as e:
             await asyncio.sleep(e.value)
         finally:
             task.end_task(task_id)
@@ -890,7 +889,7 @@ async def inviteall_cmd(client, message):
             )
             break
 
-        except (FloodWait, FloodPremiumWait) as e:
+        except FloodWait as e:
             await proses.edit(f"{em.proses}**FloodWait {e.value} seconds, waiting.**")
             await asyncio.sleep(e.value)
 
