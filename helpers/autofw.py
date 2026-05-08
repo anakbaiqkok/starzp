@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime
 
-from pyrogram.errors import FloodPremiumWait, FloodWait, UserBannedInChannel
+from pyrogram.errors import FloodWait, UserBannedInChannel
 
 from clients import star
 from config import BLACKLIST_GCAST
@@ -20,7 +20,7 @@ async def safe_forward(client, chat_id, chatids, messageids):
         await client.forward_messages(chat_id, chatids, message_ids=messageids)
         await asyncio.sleep(0.5)
         return True
-    except (FloodWait, FloodPremiumWait) as e:
+    except FloodWait as e:
         logger.warning(f"FloodWait {e.value}s on chat {chat_id}")
         await asyncio.sleep(e.value)
         try:
