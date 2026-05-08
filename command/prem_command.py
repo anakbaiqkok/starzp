@@ -243,7 +243,7 @@ async def mass_report(client, message):
         )
         status_msg = await message.reply(f"⏳ Reporting {uname}...")
         try:
-            for user in navy._ubot:
+            for user in star._ubot:
                 try:
                     peer = await user.resolve_peer(uname)
                 except UsernameNotOccupied:
