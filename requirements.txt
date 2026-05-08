@@ -69,5 +69,5 @@ youtube-search-python
 gpytranslate
 git+https://github.com/jonesroot/callgram.git@master
 git+https://github.com/google-gemini/generative-ai-python.git@main
-pyrogram-navy==2.0.210
+git+https://github.com/FerlyKurniawan/pyrofork
 git+https://github.com/FerlyKurniawan/hydrogram@dev
