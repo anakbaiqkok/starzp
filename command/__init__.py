@@ -143,4 +143,4 @@ from .cekktp_command import cekktp_cmd
 from .cektt_command import cektt_cmd
 
 from .done_command import done_cmd
-from .nokos_command import cb_shop, ch_page_shop
+from .nokos_command import cb_shop, cb_page_shop
