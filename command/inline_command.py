@@ -26,7 +26,7 @@ from pyrogram.types import (Chat, InlineKeyboardButton, InlineKeyboardMarkup,
                             InlineQueryResultPhoto, InlineQueryResultVideo,
                             InputTextMessageContent, User)
 
-from clients import bot, navy
+from clients import bot, star
 from config import (API_MAELYN, BOT_NAME, HELPABLE, SUDO_OWNERS, URL_LOGO,
                     USENAME_OWNER)
 from database import dB, state
