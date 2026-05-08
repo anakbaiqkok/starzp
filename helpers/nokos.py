@@ -1,7 +1,7 @@
 from pyrogram import filters
 from pyrogram.types import CallbackQuery
 from pyrogram.handlers import CallbackQueryHandler
-from helpers.buttons import
+from helpers.buttons import nokos
 
 
 async def cb_shop(_, callback: CallbackQuery):
