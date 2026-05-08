@@ -4,7 +4,7 @@ import traceback
 
 from pyrogram import enums
 from pyrogram.errors import (ChatWriteForbidden, MessageIdInvalid,
-                             SlowmodeWait, TopicClosed, FloodWait)
+                             SlowmodeWait, FloodWait)
 from pyrogram import enums
 
 from config import BOT_NAME
@@ -26,8 +26,8 @@ async def animate_proses(message, proses):
             msg = await message.reply(f"{proses}**Please wait...**")
     except (ChatWriteForbidden, MessageIdInvalid):
         return None
-    except TopicClosed:
-        return None
+    # except TopicClosed:
+        # return None
     except Exception:
         logger.error(f"Eror animate_proses: {traceback.format_exc()}")
         return msg
