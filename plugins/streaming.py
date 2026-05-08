@@ -1,4 +1,4 @@
-from clients import navy
+from clients import star
 from command import (channelplay_cmd, end_cmd, group_call_ends, pause_cmd,
                      play_cmd, playlist_cmd, resume_cmd, skip_cmd, volume_cmd)
 from helpers import CMD
@@ -47,7 +47,7 @@ __HELP__ = """<blockquote>Command Help **Music**</blockquote>
 IS_PRO = True
 
 
-@navy.group_call_logs()
+@star.group_call_logs()
 async def _(client, update):
     return await group_call_ends(client, update)
 
