@@ -236,6 +236,7 @@ class ButtonUtils:
                 ("🔄 Restart Userbot"),
                 ("🔄 Reset Text"),
             ],
+            ["↩️ Kembali"],
         ]
 
         if not is_admin:
