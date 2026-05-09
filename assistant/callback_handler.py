@@ -90,6 +90,67 @@ async def _(client, message):
                 disable_web_page_preview=True,
                 message_effect_id=random.choice(Basic_Effect),
             )
+        elif text == "📦 Cek Stok":
+            buttons = kb(
+                [
+                    [
+                        "ID 1",
+                        "ID 2",
+                    ],
+                    [
+                        "ID 3",
+                        "ID 4",
+                    ],
+                    [
+                        "⬅️ Back"
+                    ]
+                ],
+                resize_keyboard=True
+            )
+
+            return await message.reply(
+                "Pilih kategori ID:",
+                reply_markup=buttons
+            )
+
+        elif text == "🛒 Order Akun":
+            buttons = kb(
+                [
+                    [
+                        "ID 1",
+                        "ID 2",
+                    ],
+                    [
+                        "ID 3",
+                        "ID 4",
+                    ],
+                    [
+                        "⬅️ Back"
+                    ]
+                ],
+                resize_keyboard=True
+            )
+
+            return await message.reply(
+                "Pilih kategori ID:",
+                reply_markup=buttons
+            )
+
+        elif text.startswith("ID "):
+            category_id = text.split(" ")[1]
+
+            text_msg, button = await ButtonUtils.nokos(
+                0,
+                category_id
+            )
+
+            return await message.reply(
+                text_msg,
+                reply_markup=button
+            )
+
+        elif text == "⬅️ Back":
+            return await open_nokos(client, message)
 
     except Exception as er:
         logger.error(f"Terjadi error: {str(er)}")
