@@ -25,8 +25,8 @@ async def open_nokos(client, message):
         [
             [
                 InlineKeyboardButton(
-                    "Open Shop",
-                    callback_data="shop"
+                    "id 1",
+                    callback_data="shop 1"
                 )
             ]
         ]
@@ -43,8 +43,8 @@ async def open_nokos_cb(_, callback: CallbackQuery):
         [
             [
                 InlineKeyboardButton(
-                    "Open Shop",
-                    callback_data="shop"
+                    "id 1",
+                    callback_data="shop 1"
                 )
             ]
         ]
