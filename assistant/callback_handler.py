@@ -46,6 +46,8 @@ async def _(client, message):
             return await contact_admins(client, message)
         elif text == "🔑 Token":
             return await token_cmd(client, message)
+        elif text == "🛍️ Nokos":
+            return await 
     except Exception as er:
         logger.error(f"Terjadi error: {str(er)}")
 
