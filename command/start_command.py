@@ -115,7 +115,7 @@ async def start_home(client, message):
             # LOG_SELLER,
             # f"<b>User: {sender_mention}\nID: `{sender_id}`\nName: {sender_name}\nHas started your bot.</b>",
         # )
-    buttons = ButtonUtils.common_button()
+    buttons = ButtonUtils.start_com_button()
 
     if message.from_user.id not in SUDO_OWNERS:
         sender_id = message.from_user.id
