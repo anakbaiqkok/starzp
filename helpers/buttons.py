@@ -477,7 +477,7 @@ class ButtonUtils:
                     [
                         InlineKeyboardButton(
                             "Back",
-                            callback_data="back_menu"
+                            callback_data="open_nokos"
                         )
                     ]
                 ]
@@ -536,7 +536,7 @@ class ButtonUtils:
         nav_row.append(
             InlineKeyboardButton(
                 "Back",
-                callback_data="back_menu"
+                callback_data="open_nokos"
             )
         )
 
