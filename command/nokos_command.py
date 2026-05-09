@@ -17,3 +17,21 @@ async def cb_page_shop(_, callback: CallbackQuery):
     return await callback.edit_message_text(
           text, reply_markup=button
     ) 
+
+
+async def open_nokos(client, message):
+    buttons = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "Open Shop",
+                    callback_data="shop"
+                )
+            ]
+        ]
+    )
+
+    return await message.reply(
+        "Silahkan pilih menu Nokos:",
+        reply_markup=buttons,
+    )
