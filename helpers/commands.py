@@ -12,7 +12,7 @@ from logs import logger
 
 from .emoji_logs import Emoji
 
-trigger = r"^(💬 Jawab Pesan|👤 Akun|❌ Batalkan|✨ Mulai Buat Userbot|❓ Status Akun|🔄 Reset Emoji|🔄 Reset Prefix|🔄 Restart Userbot|🔄 Reset Text|🚀 Updates|👥 Cek User|🛠️ Cek Fitur|🛍️ Nokos|📦 Cek Stok|📋 Peraturan|🏠 Beranda|🛒 Order Akun|🧾 Riwayat|🤖 Beli Userbot|Development|Support|↩️ Beranda|✨ Pembuatan Ulang Userbot|💬 Hubungi Admins|✅ Lanjutkan Buat Userbot|🔑 Token|🧩 Plan Basic|💎 Plan Pro|⚡ Plan Lite)"
+trigger = r"^(💬 Jawab Pesan|👤 Akun|❌ Batalkan|✨ Mulai Buat Userbot|❓ Status Akun|🔄 Reset Emoji|🔄 Reset Prefix|🔄 Restart Userbot|🔄 Reset Text|🚀 Updates|👥 Cek User|🛠️ Cek Fitur|🛍️ Nokos|📦 Cek Stok|📋 Peraturan|🏠 Beranda|🛒 Order Akun|🧾 Riwayat|🤖 Beli Userbot|Development|Support|↩️ Beranda|⬅️ Back|ID 1|ID 2|ID 3|ID 4|ID 5|ID 6|ID 7|ID 8|ID (9DIGIT)|✨ Pembuatan Ulang Userbot|💬 Hubungi Admins|✅ Lanjutkan Buat Userbot|🔑 Token|🧩 Plan Basic|💎 Plan Pro|⚡ Plan Lite)"
 words = trigger.replace("^(", "").replace(")", "").split("|")
 wrapped_words = [f'"{word}"' for word in words]
 no_trigger = "[" + ", ".join(wrapped_words) + "]"
@@ -39,6 +39,16 @@ no_commands = [
     "🛒 Order Akun",
     "🏠 Beranda",
     "🧾 Riwayat",
+    "⬅️ Back",
+    "ID 1",
+    "ID 2",
+    "ID 3",
+    "ID 4",
+    "ID 5",
+    "ID 6",
+    "ID 7",
+    "ID 8",
+    "ID (9DIGIT)",
     "🔄 Reset Text",
     "🚀 Updates",
     "👥 Cek User",
