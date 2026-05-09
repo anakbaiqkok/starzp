@@ -53,7 +53,7 @@ API_HASH = os.environ.get(
     "",
 )
 
-IS_JASA_PRIVATE = os.environ.get("IS_JASA_PRIVATE", False)
+IS_JASA_PRIVATE = os.environ.get("IS_JASA_PRIVATE", True)
 
 BOT_TOKEN = os.environ.get(
     "BOT_TOKEN",
