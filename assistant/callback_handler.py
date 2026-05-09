@@ -179,6 +179,8 @@ async def _(client, callback):
                 client,
                 callback.message
             )
+            await callback.answer()
+            await callback.message.delete()
 
             return await callback.message.reply(
                 text_msg,
