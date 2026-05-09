@@ -16,6 +16,7 @@ from command import (an1cb, back_home, bola_date, bola_matches,
                      user_aggre, viewchord, viewgempa, drakorcb, cb_page_shop, cb_shop)
 from helpers import CMD, trigger
 from logs import logger
+from config import SUDO_OWNERS
 
 
 @CMD.REGEX(trigger)
