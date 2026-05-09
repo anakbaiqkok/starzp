@@ -483,6 +483,11 @@ class ButtonUtils:
                 ]
             )
 
+        data = []
+            for id_nokos in data
+                if id_nokos.startswith("1"):
+                    data.append(id_nokos)
+
         items_page = 4
         total_items = len(list_nokos)
 
