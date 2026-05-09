@@ -172,7 +172,7 @@ async def _(client, callback):
         elif query == "open_nokos":
             return await open_nokos_cb(client, callback)
 
-        elif query == "back_home":
+        elif query == "back_home_nokos":
             buttons = ButtonUtils.start_com_button()
 
             text_msg = await Message.welcome_message(
