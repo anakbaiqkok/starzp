@@ -64,10 +64,10 @@ async def _(client, message):
         elif text == "🛍️ Nokos":
             return await open_nokos(client, message)
 
-        elif query == "open_nokos":
+        # elif query == "open_nokos":
             return await open_nokos_cb(client, callback)
 
-        elif query.startswith("shop"):
+        # elif query.startswith("shop"):
             return await cb_shop(client, callback)
 
         elif text == "Support":
@@ -105,7 +105,17 @@ async def _(client, callback):
         elif query == "starthome":
             return await back_home(client, callback)
         elif query == "start_home":
-            return await back_awal(client, callback)
+            return await back_awal(client, callback)
+
+        elif query == "open_nokos":
+            return await open_nokos_cb(client, callback)
+
+        elif query.startswith("shop"):
+            return await cb_shop(client, callback)
+ 
+        elif query.startswith("list_nokos_"):
+            return await cb_page_shop(client, callback)
+
         elif query.startswith("close"):
             return await closed_user(client, callback)
         elif query.startswith("pm_warn"):
