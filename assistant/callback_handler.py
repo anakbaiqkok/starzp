@@ -65,10 +65,10 @@ async def _(client, message):
             return await open_nokos(client, message)
 
         # elif query == "open_nokos":
-            return await open_nokos_cb(client, callback)
+            # return await open_nokos_cb(client, callback)
 
         # elif query.startswith("shop"):
-            return await cb_shop(client, callback)
+            # return await cb_shop(client, callback)
 
         elif text == "Support":
             return await message.reply(
