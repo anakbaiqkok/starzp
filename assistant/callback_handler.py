@@ -13,7 +13,7 @@ from command import (an1cb, back_home, bola_date, bola_matches,
                      refresh_cat, reset_costum_text, reset_emoji, reset_prefix,
                      rest_anime, rest_comic, rest_donghua, restart_userbot,
                      selected_topic, token_cmd, tools_token, tools_userbot,
-                     user_aggre, viewchord, viewgempa, drakorcb, cb_page_shop, cb_shop)
+                     user_aggre, viewchord, viewgempa, drakorcb, cb_page_shop, cb_shop, open_nokos)
 from helpers import CMD, trigger, Message
 from logs import logger
 from config import SUDO_OWNERS
