@@ -172,6 +172,21 @@ async def _(client, callback):
         elif query == "open_nokos":
             return await open_nokos_cb(client, callback)
 
+        elif query == "back_home":
+            buttons = ButtonUtils.start_com_button()
+
+            text_msg = await Message.welcome_message(
+                client,
+                callback.message
+            )
+
+            return await callback.message.reply(
+                text_msg,
+                reply_markup=buttons,
+                disable_web_page_preview=True,
+                message_effect_id=random.choice(Basic_Effect),
+            )
+
         elif query.startswith("shop"):
             return await cb_shop(client, callback)
  
