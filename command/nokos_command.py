@@ -35,3 +35,21 @@ async def open_nokos(client, message):
         "Silahkan pilih menu Nokos:",
         reply_markup=buttons,
     )
+
+
+async def open_nokos_cb(_, callback: CallbackQuery):
+    buttons = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "Open Shop",
+                    callback_data="shop"
+                )
+            ]
+        ]
+    )
+
+    return await callback.edit_message_text(
+        "Silahkan pilih menu Nokos:",
+        reply_markup=buttons,
+    )
