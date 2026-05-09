@@ -5,10 +5,16 @@ from helpers.buttons import ButtonUtils
 
 
 async def cb_shop(_, callback: CallbackQuery):
-    category_id = callback.data.split()
-    text, button = await ButtonUtils.nokos(0, category_id[1])
+    category_id = callback.data.split()[1]
+
+    text, button = await ButtonUtils.nokos(
+        0,
+        category_id
+    )
+
     return await callback.edit_message_text(
-          text, reply_markup=button
+        text,
+        reply_markup=button
     )
 
 
@@ -21,26 +27,62 @@ async def cb_page_shop(_, callback: CallbackQuery):
     if category_id == "all":
         category_id = None
 
-    text, button = await ButtonUtils.nokos(page, category_id)
+    text, button = await ButtonUtils.nokos(
+        page,
+        category_id
+    )
 
     return await callback.edit_message_text(
         text,
         reply_markup=button
     )
 
+
 async def open_nokos(client, message):
-    text, button = await ButtonUtils.nokos()
+    text = """
+<blockquote><b>📱 Beli Akun Telegram</b></blockquote>
+
+📦 <b>Cek Stok</b> — Ketersediaan per tipe ID
+📋 <b>Peraturan</b> — Baca sebelum beli
+🧾 <b>Riwayat</b> — Histori transaksi Anda
+🛒 <b>Order Akun</b> — Beli sekarang
+
+<i>Beli akun Telegram siap pakai.</i>
+"""
+
+    buttons = kb(
+        [
+            [
+                "📦 Cek Stok",
+                "📋 Peraturan",
+            ],
+            [
+                "🧾 Riwayat",
+                "🛒 Order Akun",
+            ],
+            [
+                "🏠 Beranda"
+            ]
+        ],
+        resize_keyboard=True
+    )
 
     return await message.reply(
         text,
-        reply_markup=button,
+        reply_markup=buttons,
     )
 
 
 async def open_nokos_cb(_, callback: CallbackQuery):
-    text, button = await ButtonUtils.nokos()
+    text = """
+<blockquote><b>📱 Beli Akun Telegram</b></blockquote>
 
-    return await callback.edit_message_text(
-        text,
-        reply_markup=button,
-    )
+📦 <b>Cek Stok</b> — Ketersediaan per tipe ID
+📋 <b>Peraturan</b> — Baca sebelum beli
+🧾 <b>Riwayat</b> — Histori transaksi Anda
+🛒 <b>Order Akun</b> — Beli sekarang
+
+<i>Beli akun Telegram siap pakai.</i>
+"""
+
+    return await callback.edit_message_text(text)
