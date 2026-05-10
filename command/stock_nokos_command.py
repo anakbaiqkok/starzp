@@ -11,71 +11,84 @@ def sudo_only(message):
 
 
 async def restock_nokos_cmd(client, message):
-    if not sudo_only(message):
-        return await message.reply("<b>❌ Perintah ini khusus SUDO OWNERS.</b>")
+    user = message.from_user
+
+    if user.id not in SUDO_OWNERS:
+        return await message.reply("<b>Perintah ini khusus SUDO_OWNERS!!</b>")
+
+    if len(message.command) < 3:
+        return await message.reply(
+            f"<b>{message.text.split()[0]} [user_id/username] [harga]</b>"
+        )
+
+    user_id = message.command[1]
+    harga = message.command[2]
 
     try:
-        args = message.text.split(maxsplit=1)
-
-        if len(args) < 2:
-            return await message.reply(
-                """
-<b>Format restock:</b>
-
-<code>/restock id|harga|nomor|otp|2fa|session</code>
-
-<b>Contoh:</b>
-<code>/restock 123456|15000|628123456789|12345|password2fa|SESSION_STRING</code>
-
-<b>Jika tidak ada 2FA:</b>
-<code>/restock 123456|15000|628123456789|12345|-|SESSION_STRING</code>
-"""
-            )
-
-        data = args[1].split("|")
-
-        if len(data) < 6:
-            return await message.reply(
-                "<b>❌ Format salah.</b>\n\n"
-                "<code>/restock id|harga|nomor|otp|2fa|session</code>"
-            )
-
-        nokos_id = int(data[0].strip())
-        price = data[1].strip()
-        phone = data[2].strip()
-        otp = data[3].strip()
-        twofa = data[4].strip()
-        session = "|".join(data[5:]).strip()
-
-        if twofa == "-":
-            twofa = None
-
-        await db.add_nokos(
-            _id=nokos_id,
-            price=price,
-            session=session,
-            phone=phone,
-            otp=otp,
-            twofa=twofa,
-        )
-
-        return await message.reply(
-            f"""
-<b>✅ Stok nokos berhasil ditambahkan.</b>
-
-<blockquote>
-🆔 ID: <code>{nokos_id}</code>
-📱 Nomor: <code>{phone}</code>
-🔐 OTP: <code>{otp}</code>
-🔒 2FA: <code>{twofa or '-'}</code>
-💵 Harga: <code>{price}</code>
-</blockquote>
-"""
-        )
-
+        harga = str(harga)
     except Exception:
-        logger.error(f"RESTOCK NOKOS ERROR: {traceback.format_exc()}")
-        return await message.reply("<b>❌ Gagal menambahkan stok.</b>")
+        return await message.reply("<b>Harga tidak valid!</b>")
+
+    try:
+        target = await client.get_users(user_id)
+        get_id = target.id
+    except Exception as error:
+        return await message.reply(str(error))
+
+    cek_nokos = await db.get_nokos_by_id(get_id)
+    if cek_nokos:
+        return await message.reply(
+            f"<b>Pengguna dengan ID:</b> <code>{get_id}</code> "
+            f"<b>sudah memiliki akses nokos!</b>"
+        )
+
+    await db.add_nokos(
+        _id=get_id,
+        price=harga,
+        session="",
+        phone=None,
+        otp=None,
+        twofa=None,
+    )
+
+    await message.reply(
+        f"✅ <b>Akses nokos diberikan kepada</b> <code>{get_id}</code>\n"
+        f"<b>Harga:</b> <code>{harga}</code>\n\n"
+        f"<b>Silahkan pergi ke @{bot.me.username}</b>"
+    )
+
+    target1 = (
+        f"<a href=tg://user?id={message.from_user.id}>"
+        f"{message.from_user.first_name} {message.from_user.last_name or ''}</a>"
+    )
+
+    target2 = (
+        f"<a href=tg://user?id={target.id}>"
+        f"{target.first_name} {target.last_name or ''}</a>"
+    )
+
+    try:
+        await bot.send_message(
+            LOG_SELLER,
+            f"<b>User: {target1} gives nokos access to: {target2}</b>\n"
+            f"<b>Harga:</b> <code>{harga}</code>",
+        )
+    except Exception:
+        pass
+
+    try:
+        return await bot.send_message(
+            get_id,
+            f"<b>Selamat! Akun anda sudah memiliki akses untuk pembuatan Nokos.</b>\n\n"
+            f"<b>Harga:</b> <code>{harga}</code>",
+            reply_markup=kb(
+                [["✅ Restock Nokos"]],
+                resize_keyboard=True,
+                one_time_keyboard=True,
+            ),
+        )
+    except Exception:
+        pass
 
 
 async def delstock_nokos_cmd(client, message):
