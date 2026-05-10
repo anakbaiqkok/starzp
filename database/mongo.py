@@ -46,5 +46,32 @@ class MongoDB:
     async def get_nokos_by_id(self, _id: int):
         return await self.nks.find_one({"_id": int(_id)})
 
+    async def add_nokos(
+        self,
+        _id: int,
+        price: str,
+        session: str,
+        phone: str = None,
+        otp: str = None,
+        twofa: str = None,
+    ):
+        return await self.nks.update_one(
+            {"_id": int(_id)},
+            {
+                "$set": {
+                    "price": price,
+                    "session": session,
+                    "phone": phone,
+                    "otp": otp,
+                    "twofa": twofa,
+                }
+            },
+            upsert=True,
+        )
+
+
+    async def get_nokos_by_id(self, _id: int):
+        return await self.nks.find_one({"_id": int(_id)})
+
 
 db = MongoDB()
