@@ -84,7 +84,7 @@ from .metaai_command import metaai_cmd
 from .notes_command import (clearnotes_cmd, get_raw_note, getnote_cmd,
                             getnotes_, listnotes_cmd, savenote_cmd)
 from .payment_command import (cancel_payment, cancelpay_cmd, chose_plan,
-                              confirm_pay, kurang_tambah, qris_cmd, user_aggre, buy_nokos_payment)
+                              confirm_pay, kurang_tambah, qris_cmd, user_aggre, buy_nokos_payment, cancel_nokos_payment)
 from .pmpermit_command import (AUTO_APPROVE, PMPERMIT, nopm_cmd, okpm_cmd,
                                pmpermit_cmd)
 from .prem_command import (add_prem_user, add_seller, addexpired_user,
