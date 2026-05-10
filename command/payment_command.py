@@ -8,7 +8,7 @@ from pyrogram.helpers import ikb, kb
 from pyrogram.types import ReplyKeyboardRemove
 from pytz import timezone
 from html import escape
-from clients import bot
+from clients import bot, star
 from config import (AKSES_DEPLOY, IS_JASA_PRIVATE, LOG_SELLER, OWNER_ID,
                     SAWERIA_EMAIL, SAWERIA_USERID, SAWERIA_USERNAME)
 from database import dB, db
