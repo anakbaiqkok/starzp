@@ -3,6 +3,7 @@ import traceback
 from config import SUDO_OWNERS
 from database import db
 from logs import logger
+from clients import bot, star
 
 
 def sudo_only(message):
