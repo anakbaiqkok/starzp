@@ -599,3 +599,16 @@ class CMD:
                 return await func(client, cq)
 
         return wrapper
+
+
+    @staticmethod
+    def OWNER_AND_GC(func):
+        async def function(client, message):
+            user = message.from_user
+            own = await dB.get_list_from_var(BOT_ID, "SUDO_OWNERS")
+            if user.id not in own:
+                return await message.reply("<b>Kamu bukan owner bot!!</b>")
+
+            return await func(client, message)
+
+        return function
