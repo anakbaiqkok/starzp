@@ -1,3 +1,4 @@
+"""
 from helpers import CMD
 from command import from (
     restock_nokos_cmd,
@@ -23,3 +24,4 @@ async def _(client, message):
 @CMD.OWNER_AND_GC
 async def _(client, message):
     return await getstock_nokos_cmd(client, message)
+"""
