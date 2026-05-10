@@ -11,7 +11,7 @@ from pytz import timezone
 from clients import bot
 from config import (AKSES_DEPLOY, IS_JASA_PRIVATE, LOG_SELLER, OWNER_ID,
                     SAWERIA_EMAIL, SAWERIA_USERID, SAWERIA_USERNAME)
-from database import dB
+from database import dB, db
 from helpers import ButtonUtils, Emoji, Message, Saweria
 from logs import logger
 
@@ -606,3 +606,29 @@ Jika sudah membayar, sistem akan otomatis memproses pesanan.
             user_id,
             "<b>Terjadi error saat membuat payment nokos.</b>",
         )
+
+async def cancel_nokos_payment(client, callback_query):
+    await callback_query.answer()
+    user_id = callback_query.from_user.id
+
+    if user_id not in nokos_transactions:
+        return await callback_query.message.reply(
+            "<b>❌ Tidak ada transaksi nokos aktif.</b>"
+        )
+
+    trans = nokos_transactions[user_id]
+
+    try:
+        await client.delete_messages(
+            chat_id=user_id,
+            message_ids=trans["message_id"],
+        )
+    except Exception:
+        pass
+
+    del nokos_transactions[user_id]
+
+    return await client.send_message(
+        user_id,
+        "<b>✅ Transaksi nokos berhasil dibatalkan.</b>",
+    )
