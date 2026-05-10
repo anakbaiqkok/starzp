@@ -43,6 +43,8 @@ class MongoDB:
         async for data in cursor:
             result.append(data)
         return result 
+    async def get_nokos_by_id(self, _id: int):
+        return await self.nks.find_one({"_id": int(_id)})
 
 
 db = MongoDB()
