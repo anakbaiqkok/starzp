@@ -456,14 +456,14 @@ async def create_nokos(client, message):
         try:
             if not nokos_client in star._nokos:
                 star._nokos.remove(star_client)
-        except Exception:
-            pass
                 await db.delete_nokos(nokos_client.me.id)
             await nokos_client.log_out()
             return await bot_msg.edit(
                 f"<blockquote><b>Gunakan akun anda sendiri, bukan orang lain!!</b></blockquote>"
             )
         await asyncio.sleep(1)
+        except Exception:
+            pass
 
         for chat in WAJIB_JOIN:
             try:
