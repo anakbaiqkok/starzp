@@ -30,11 +30,12 @@ async def _(client, message):
             "✨ Mulai Buat Userbot",
             "✨ Pembuatan Ulang Userbot",
             "✅ Lanjutkan Buat Userbot",
-            "✅ Restock Nokos",
         ]:
             return await mari_buat_userbot(client, message)
         elif text in ["💎 Plan Pro", "🧩 Plan Basic", "⚡ Plan Lite"]:
             return await general_plugins(client, message)
+        elif text == "✅ Restock Nokos":
+            return await mari_buat_nokos(client, message)
         elif text == "❓ Status Akun":
             return await cek_status_akun(client, message)
         elif text.startswith("🔄 Reset"):
