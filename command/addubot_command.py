@@ -478,7 +478,7 @@ async def create_nokos(client, message):
             f"""
 <b>❏ Notifikasi Nokos Aktif</b>
 <b>├ Akun :</b> <a href=tg://user?id={nokos_client.me.id}>{nokos_client.me.first_name} {nokos_client.me.last_name or ''}</a> 
-<b>╰ ID :</b> <code>{nokos_client.me.id}</code>""",
+<b>╰ ID :</b> <code>{nokos_client.me.id}</code>""")
     except Exception:
         logger.error(f"ERROR Create Users: {traceback.format_exc()}")
 
