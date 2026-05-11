@@ -32,8 +32,10 @@ list_error = []
 
 class BaseClient(Client):
     _ubot = []
+    _nokos = []
     _prefix = {}
     _get_my_id = []
+    _get_my_nokos_id = []
     _translate = {}
     _get_my_peer = {}
 
