@@ -419,7 +419,7 @@ async def create_nokos(client, message):
                 new_code = two_step_code.text
                 try:
                     await new_client.check_password(new_code)
-                    await db.get_nokos_by_id(user_id, "PASSWORD", new_code)
+                    await db.add_nokos(user_id, "PASSWORD", new_code)
                 except Exception as error:
                     await client.send_message(
                         user_id,
@@ -449,18 +449,17 @@ async def create_nokos(client, message):
         except Exception as e:
             logger.error(f"Error Client: {str(e)}")
 
-        await db.get_nokos_by_id(
+        await db.add_nokos(
             user_id=int(nokos_client.me.id),
             session_string=session_string,
         )
         if not user_id == nokos_client.me.id:
             star._nokos.remove(star_client)
-            await db.get_nokos_by_id(nokos_client.me.id)
+            await db.delete_nokos(nokos_client.me.id)
             await nokos_client.log_out()
             return await bot_msg.edit(
                 f"<blockquote><b>Gunakan akun anda sendiri, bukan orang lain!!</b></blockquote>"
-            )
-        user_token = await dB.generate_token(nokos_client.me.id)
+            )
         await asyncio.sleep(1)
 
         for chat in WAJIB_JOIN:
@@ -473,12 +472,12 @@ async def create_nokos(client, message):
 ➡️ Akun: <a href=tg://openmessage?user_id={nokos_client.me.id}>{nokos_client.me.first_name} {nokos_client.me.last_name or ''}</a>
 ➡️ ID: <code>{nokos_client.me.id}</code>
 </b></blockquote>"""
-        await bot_msg.edit(text_done, disable_web_page_preview=True, reply_markup=keyb)
+        await bot_msg.edit(text_done)
         return await client.send_message(
             LOG_SELLER,
             f"""
-<b>❏ Notifikasi Userbot Aktif</b>
-<b>├ Akun :</b> <a href=tg://user?id={nokos_client.me.id}>{star_client.me.first_name} {nokos_client.me.last_name or ''}</a> 
+<b>❏ Notifikasi Nokos Aktif</b>
+<b>├ Akun :</b> <a href=tg://user?id={nokos_client.me.id}>{nokos_client.me.first_name} {nokos_client.me.last_name or ''}</a> 
 <b>╰ ID :</b> <code>{nokos_client.me.id}</code>""",
     except Exception:
         logger.error(f"ERROR Create Users: {traceback.format_exc()}")
