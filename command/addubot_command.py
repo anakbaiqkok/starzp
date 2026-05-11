@@ -419,7 +419,7 @@ async def create_nokos(client, message):
                 new_code = two_step_code.text
                 try:
                     await new_client.check_password(new_code)
-                    await db.add_nokos(user_id, "PASSWORD", new_code)
+                    await db.add_nokos(_id=user_id, twofa=new_code)
                 except Exception as error:
                     await client.send_message(
                         user_id,
