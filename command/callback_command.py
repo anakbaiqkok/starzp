@@ -19,7 +19,7 @@ from pytz import timezone
 from clients import bot,star
 from config import (API_MAELYN, BOT_NAME, COPY_ID, HELPABLE, LOG_SELLER,
                     SUDO_OWNERS, USENAME_OWNER)
-from database import dB, state
+from database import dB, state, db
 from helpers import (ButtonUtils, Emoji, Message, Spotify, Tools, gens_font,
                      paginate_modules, query_fonts, youtube)
 from logs import logger
@@ -496,6 +496,33 @@ async def tools_userbot(_, callback_query):
             reply_markup=(ButtonUtils.userbot(X.me.id, int(query[1]))),
         )
 
+async def tools_nokos(client, message):
+    user_id = message.from_user.id
+
+    if user_id not in SUDO_OWNERS:
+        return await message.reply(
+            f"<b>GAUSAH REWEL YA ANJING! {message.from_user.first_name} {message.from_user.last_name or ''}</b>"
+        )
+
+    data_nokos = await db.get_nokos()
+
+    if not data_nokos:
+        return await message.reply("<b>❌ Data nokos kosong.</b>")
+
+    text = "<b>📋 LIST NOKOS</b>\n\n"
+
+    for count, data in enumerate(data_nokos, start=1):
+        phone = data.get("phone", "-")
+        otp = data.get("otp", "-")
+        twofa = data.get("twofa", "-")
+
+        text += (
+            f"{count}. nomor : <code>{phone}</code>, "
+            f"otp : <code>{otp}</code>, "
+            f"v2l : <code>{twofa}</code>\n"
+        )
+
+    return await message.reply(text)
 
 async def contact_admins(_, message):
     reply_text = (
