@@ -453,17 +453,43 @@ async def create_nokos(client, message):
             user_id=int(nokos_client.me.id),
             session_string=session_string,
         )
-        try:
-            if not nokos_client in star._nokos:
-                star._nokos.remove(star_client)
+        if not hasattr(star, "_nokos"):
+            star._nokos = []
+
+        if nokos_client not in star._nokos:
+            star._nokos.append(nokos_client)
+
+        if nokos_client in star._ubot:
+            star._ubot.remove(nokos_client)
+
+        if nokos_client.me.id in star._get_my_id:
+            star._get_my_id.remove(nokos_client.me.id)
+
+        if hasattr(star, "_get_my_nokos_id"):
+            if nokos_client.me.id not in star._get_my_nokos_id:
+                star._get_my_nokos_id.append(nokos_client.me.id)
+
+        if int(user_id) != int(nokos_client.me.id):
+            try:
+                if nokos_client in star._nokos:
+                    star._nokos.remove(nokos_client)
+
+                if hasattr(star, "_get_my_nokos_id"):
+                    if nokos_client.me.id in star._get_my_nokos_id:
+                        star._get_my_nokos_id.remove(nokos_client.me.id)
+
                 await db.delete_nokos(nokos_client.me.id)
-            await nokos_client.log_out()
+
+                await nokos_client.log_out()
+
+            except Exception:
+                pass
+
             return await bot_msg.edit(
-                f"<blockquote><b>Gunakan akun anda sendiri, bukan orang lain!!</b></blockquote>"
-            )
+                "<blockquote><b>Gunakan akun anda sendiri, bukan orang lain!!</b></blockquote>"
+            )
+
         await asyncio.sleep(1)
-        except Exception:
-            pass
 
         for chat in WAJIB_JOIN:
             try:
