@@ -146,7 +146,7 @@ async def send_nokos(client, message):
 
     return await client.send_message(
         message.from_user.id,
-        await Message.nokos(),
+        await ButtonUtils.nokos(),
     )
 
 
