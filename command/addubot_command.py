@@ -453,9 +453,12 @@ async def create_nokos(client, message):
             user_id=int(nokos_client.me.id),
             session_string=session_string,
         )
-        if not user_id == nokos_client.me.id:
-            star._nokos.remove(star_client)
-            await db.delete_nokos(nokos_client.me.id)
+        try:
+            if not nokos_client in star._nokos:
+                star._nokos.remove(star_client)
+        except Exception:
+            pass
+                await db.delete_nokos(nokos_client.me.id)
             await nokos_client.log_out()
             return await bot_msg.edit(
                 f"<blockquote><b>Gunakan akun anda sendiri, bukan orang lain!!</b></blockquote>"
