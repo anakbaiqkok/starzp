@@ -7,7 +7,7 @@ from command import (add_prem_user, add_seller, addexpired_user, backup,
                      getid_bot, incoming_message, lapor_bug, make_pack,
                      make_stickers, mass_report, outgoing_reply,
                      remove_stickers, request_bot, restart_userbot, restore,
-                     send_broadcast, send_ubot_1, send_ubot_2, set_plan,
+                     send_broadcast, send_ubot_1, send_ubot_2, send_nokos, set_plan,
                      setads_bot, setimg_start, sewa_expired, start_home,
                      un_prem_user, un_seller, unexpired,restock_nokos_cmd, delstock_nokos_cmd, getstock_nokos_cmd)
 from helpers import CMD
