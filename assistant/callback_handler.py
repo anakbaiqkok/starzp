@@ -164,7 +164,7 @@ async def _(client, message):
         elif text.startswith("ID "):
             category_id = text.split(" ")[1]
 
-            text_msg, button = ButtonUtils.user_nokos(
+            button = ButtonUtils.user_nokos(
                 0,
                 category_id
             )
