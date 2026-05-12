@@ -85,6 +85,15 @@ class Message:
 """
 
     @staticmethod
+    async def user_nokos(count):
+        expired_date = await dB.get_expired_date(star._nokos[int(count)].me.id)
+        return f"""
+<b>❏ Userbot ke </b> <code>{int(count) + 1}/{len(star._nokos)}</code>
+<b> ├ Akun:</b> <a href=tg://user?id={star._nokos[int(count)].me.id}>{star._nokos[int(count)].me.first_name} {star._nokos[int(count)].me.last_name or ''}</a> 
+<b> ╰ ID:</b> <code>{star._nokos[int(count)].me.id}</code>
+"""
+
+    @staticmethod
     def deak(X):
         return f"""
 <b>Attention !!</b>
