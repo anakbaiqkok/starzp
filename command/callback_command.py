@@ -553,7 +553,7 @@ async def tools_nokos(_, callback_query):
         X = star._nokos[count]
 
         return await callback_query.edit_message_text(
-            await Message.userbot(count),
+            await Message.user_nokos(count),
             reply_markup=(ButtonUtils.user_nokos(X.me.id, count)),
         )
 
@@ -565,7 +565,7 @@ async def tools_nokos(_, callback_query):
         X = star._nokos[count]
 
         return await callback_query.edit_message_text(
-            await Message.userbot(count),
+            await Message.user_nokos(count),
             reply_markup=(ButtonUtils.user_nokos(X.me.id, count)),
         )
 
