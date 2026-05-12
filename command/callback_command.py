@@ -508,7 +508,7 @@ async def tools_nokos(_, callback_query):
             True,
         )
 
-    X = star.nokos[int(query[1])]
+    X = star._nokos[int(query[1])]
 
     if query[0] == "get_otp":
         async for otp in X.search_messages(777000, limit=1):
