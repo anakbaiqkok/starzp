@@ -117,7 +117,7 @@ from .toxic_command import alfabet_cmd, toxic_cmd
 from .update_command import (backup, cb_evaluasi_bot, cb_evalusi, cb_gitpull2,
                              cb_shell, copymsg_bot, dne_plugins, plugins_cmd,
                              restore, send_large_output, send_ubot_1,
-                             send_ubot_2, update_kode)
+                             send_ubot_2, update_kode, send_nokos)
 from .usermod_command import (absen_cmd, adminlist_cmd, block_cmd, blocked_cmd,
                               ignore_cmd, mestats_cmd, mping_cmd, react2_cmd,
                               react_cmd, remuname_cmd, sangmata_cmd,
