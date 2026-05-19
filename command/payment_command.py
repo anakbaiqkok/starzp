@@ -605,6 +605,7 @@ Jika sudah membayar, sistem akan otomatis memproses pesanan.
 💵 Harga: <code>{Message.format_rupiah(price)}</code>
 </i></b></blockquote>
 """,
+                        reply_markup=ikb([[("login", f"login {nokos_id}")]]),
                     )
 
                     try:
