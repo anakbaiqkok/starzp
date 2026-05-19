@@ -615,7 +615,7 @@ Jika sudah membayar, sistem akan otomatis memproses pesanan.
                     except Exception:
                         pass
 
-                    await db.delete_nokos(nokos_id)
+                    # await db.delete_nokos(nokos_id)
                     del nokos_transactions[user_id]
                     break
 
