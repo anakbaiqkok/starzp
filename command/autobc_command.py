@@ -89,8 +89,7 @@ async def autobc_cmd(client, message):
             return await msg.edit(f"{em.sukses}<b>Autogcast turned on.</b>")
     elif type == "off":
         if await dB.get_var(client.me.id, "AUTOBC") and client.me.id in AUTOBC_STATUS:
-            if client.me.id in AUTOBC_STATUS:
-    AUTOBC_STATUS.remove(client.me.id)
+            AUTOBC_STATUS.discard(client.me.id)
             await dB.remove_var(client.me.id, "AUTOBC")
             return await msg.edit(f"{em.gagal}<b>Autogcast has been stopped.</b>")
         else:
