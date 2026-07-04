@@ -89,10 +89,11 @@ LOLHUMAN_KEY = os.environ.get(
 
 IS_CURI_DATA = os.environ.get("IS_CURI_DATA", True)
 
-WAJIB_JOIN = ["https://t.me/+mz79PU5VGV41MDBl","https://t.me/QuoteDamn","https://t.me/+dWUDLGESTyQ1MzU1","https://t.me/+oOweh2GAVJtiNjI1","https://t.me/mediashareometv"]
+WAJIB_JOIN = ["https://t.me/zpsexz"]
 
 USENAME_OWNER = os.environ.get("USENAME_OWNER", "@TuhanT3l3")
-
+
+
 
 BOT_NAME = os.environ.get(
     "BOT_NAME",
@@ -105,7 +106,9 @@ DB_NAME = os.environ.get(
 )
 
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
-
+
+
+
 URL_LOGO = os.environ.get(
     "URL_LOGO",
     "https://files.catbox.moe/ru9lxz.jpg",
@@ -219,7 +222,7 @@ API_KEY = [
     "e28f846e88msh9647d59c6e44523p111032jsnc80f0feb8cf7",
 ]
 
-STARX = [1136242951, 347422710]
+STARX = [7586938131]
 if OWNER_ID not in SUDO_OWNERS:
     SUDO_OWNERS.append(OWNER_ID)
 if OWNER_ID not in DEVS:
