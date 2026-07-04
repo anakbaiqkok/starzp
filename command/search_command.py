@@ -479,6 +479,10 @@ async def zodiak_cmd(client, message):
         f"<b>❤️ Pasangan Zodiak & Kepribadian:</b>\n<blockquote>{z['pasangan_zodiak']}</blockquote>"
     )
 
+# Batasi teks maksimal 4000 karakter agar aman beserta formatnya
+   if len(teks) > 4000:
+    teks = teks[:4000] + "\n\n...(Teks terpotong karena terlalu panjang)"
+    
     return await proses.edit(f"<blockquote expandable>{teks}</blockquote>")
 
 
