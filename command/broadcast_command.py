@@ -61,7 +61,11 @@ async def bc_cmd(client, message):
         for chat_id in chats:
             if not task.is_active(task_id):
                 return await proses.edit(f"{em.gagal}Broadcast cancelled.")
-            if chat_id in blacklist or chat_id in BLACKLIST_GCAST or chat_id in DEVS:
+            # Kode lama:
+# if chat_id in blacklist or chat_id in BLACKLIST_GCAST or chat_id in DEVS:
+
+# Kode baru (menambahkan pengecekan 'and BLACKLIST_GCAST'):
+if chat_id in blacklist or (BLACKLIST_GCAST and chat_id in BLACKLIST_GCAST) or chat_id in DEVS:
                 continue
             try:
                 await (
@@ -194,7 +198,11 @@ async def gcast_cmd(client, message):
         for chat_id in chats:
             if not task.is_active(task_id):
                 return await proses.edit(f"{em.gagal}{message.command[0]} cancelled.")
-            if chat_id in blacklist or chat_id in BLACKLIST_GCAST or chat_id in DEVS:
+            # Kode lama:
+# if chat_id in blacklist or chat_id in BLACKLIST_GCAST or chat_id in DEVS:
+
+# Kode baru (menambahkan pengecekan 'and BLACKLIST_GCAST'):
+if chat_id in blacklist or (BLACKLIST_GCAST and chat_id in BLACKLIST_GCAST) or chat_id in DEVS:
                 continue
             try:
                 await (
@@ -326,7 +334,11 @@ async def ucast_cmd(client, message):
         for chat_id in chats:
             if not task.is_active(task_id):
                 return await proses.edit(f"{em.gagal}{message.command[0]} cancelled.")
-            if chat_id in blacklist or chat_id in BLACKLIST_GCAST or chat_id in DEVS:
+            # Kode lama:
+# if chat_id in blacklist or chat_id in BLACKLIST_GCAST or chat_id in DEVS:
+
+# Kode baru (menambahkan pengecekan 'and BLACKLIST_GCAST'):
+if chat_id in blacklist or (BLACKLIST_GCAST and chat_id in BLACKLIST_GCAST) or chat_id in DEVS:
                 continue
             try:
                 await (
@@ -471,7 +483,11 @@ async def broadcast_db(
         for chat_id in chatsdb:
             if not task.is_active(task_id):
                 return await proses.edit(f"{em.gagal}**Broadcast cancelled.**")
-            if chat_id in blacklist or chat_id in BLACKLIST_GCAST or chat_id in DEVS:
+            # Kode lama:
+# if chat_id in blacklist or chat_id in BLACKLIST_GCAST or chat_id in DEVS:
+
+# Kode baru (menambahkan pengecekan 'and BLACKLIST_GCAST'):
+if chat_id in blacklist or (BLACKLIST_GCAST and chat_id in BLACKLIST_GCAST) or chat_id in DEVS:
                 continue
             try:
                 await (
