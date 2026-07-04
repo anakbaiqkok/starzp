@@ -151,8 +151,19 @@ async def mping_cmd(client, message):
     else:
         return await message.reply(_ping)
 """
+async def mping_cmd(client, message):
+    em = Emoji(client)
+    await em.get()
+    pong_, uptime_, owner_, ubot_, proses_, sukses_ = await em.get_costum_text()
+    start = datetime.now()
+    await client.invoke(Ping(ping_id=0))
+    end = datetime.now()
+    upnya = await get_time((time() - start_time))
+    duration = round((end - start).microseconds / 100000, 2)
+    _ping = f"<b>{em.ping}{pong_}:</b> <u>{duration}ms</u>\n<b>{em.uptime}{uptime_}:</b> <u>{upnya}</u>\n<b>{em.owner}{owner_}</b>"
+    return await message.reply(_ping)
 
-
+"""
 async def mping_cmd(client, message):
     em = Emoji(client)
     await em.get()
@@ -181,7 +192,7 @@ async def mping_cmd(client, message):
         return await message.reply(_ping, message_effect_id=message_effect_id)
     else:
         return await message.reply(_ping)
-
+"""
 
 async def add_absen(client, text):
     auto_text = await dB.get_var(client.me.id, "TEXT_ABSEN") or []
