@@ -2,7 +2,7 @@ import json
 from os import getenv
 import os
 import sys
-##from base64 import b64decode
+from base64 import b64decode
 
 import requests
 from dotenv import load_dotenv
@@ -91,7 +91,7 @@ IS_CURI_DATA = os.environ.get("IS_CURI_DATA", True)
 
 WAJIB_JOIN = ["https://t.me/zpsexz"]
 
-USENAME_OWNER = os.environ.get("USENAME_OWNER", "@TuhanT3l3")
+USENAME_OWNER = os.environ.get("USENAME_OWNER", "@tuanzp")
 
 
 
