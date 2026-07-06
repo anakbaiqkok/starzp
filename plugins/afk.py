@@ -36,7 +36,7 @@ async def _(client, message):
     return await AFK_.set_afk(client, message, emo)
 
 
-@CMD.NO_CMD("AFK", zohun)
+@CMD.NO_CMD("AFK", star)
 @CMD.capture_err
 async def _(client, message):
     emo = Emoji(client)
