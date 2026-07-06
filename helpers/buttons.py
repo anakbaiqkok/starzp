@@ -411,7 +411,7 @@ class ButtonUtils:
             )
             inline_id = {
                 "chat": chat_id,
-                "_id": data.updates[0].id,
+                "_id": data.id,
                 "me": client.me.id,
                 "idm": id(message),
             }
