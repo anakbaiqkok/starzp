@@ -131,7 +131,7 @@ def gen_pantun(prompt):
     }
 
     model = genai.GenerativeModel(
-        "models/gemini-1.5-flash",
+        "zyloo/gemini-3.5-flash",
         system_instruction=(
             """
 sesuaikan dengan input yang anda terima.
