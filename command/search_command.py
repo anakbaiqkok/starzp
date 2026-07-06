@@ -439,7 +439,7 @@ async def zodiak_cmd(client, message):
         "pisces",
     ]
     if len(message.command) < 2:
-        return await proses.edit(
+        return await proses.edit(teks[:MAX_CAPTION_LENGTH])(
             f"{em.gagal}**Please give zodiak name\n\n<code>{', '.join([z.capitalize() for z in ZODIAK_LIST])}</code>**"
         )
     try:
