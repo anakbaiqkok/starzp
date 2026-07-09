@@ -72,7 +72,7 @@ class StreamingTools:
 
         stream_kwargs = {
             "media_path": url,
-            "audio_parameters": AudioQuality.STUDIO,
+            "audio_parameters": AudioQuality.MEDIUM,
             "ytdlp_parameters": ydl_params,
         }
 
