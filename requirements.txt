@@ -66,7 +66,7 @@ python-telegram-bot
 telethon
 yt-dlp[default]>=2025.12.8
 youtube-search
-youtube-search-python
+###youtube-search-python
 gpytranslate
 git+https://github.com/jonesroot/yt-search-python.git@legacy
 git+https://github.com/zpkemem-code/callgram.git@master
