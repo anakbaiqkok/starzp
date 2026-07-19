@@ -176,7 +176,7 @@ async def gen_kdm(text):
         {"role": "system", "content": role.strip()},
         {"role": "user", "content": text.strip()},
     ]
-    url = "https://api.siputzx.my.id/api/ai/gpt3"
+    url = "https://api.botcahx.eu.org/api/search/openai-custom-v2"
     res = await Tools.fetch.post(url, json=data_json)
     if res.status_code == 200:
         data = res.json()
