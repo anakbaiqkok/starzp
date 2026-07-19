@@ -8,7 +8,7 @@ from pyrogram.errors import ImageProcessFailed, MessageTooLong, RPCError
  
 from config import API_BOTCHAX 
 from helpers import CMD, Emoji, Message, Tools 
-from logger import logger 
+from logs import logger 
  
 MODULES = "Khodam" 
 HELP = """<blockquote>Command Help Khodam</blockquote> 
