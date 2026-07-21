@@ -13,7 +13,7 @@ from logs import logger
 flood = {}
 flood2 = {}
 
-DEFAULT_TEXT = "Hey {mention} 👋.  Don't spam or you'll be blocked!!"
+DEFAULT_TEXT = "Hey {mention} 👋. 𝗷𝗮𝗻𝗴𝗮𝗻 𝘀𝗽𝗮𝗺 𝗮𝗷𝗴 𝗮𝘁𝗮𝘂 𝗹𝗼 𝗴𝘂𝗮 𝗯𝗹𝗼𝗸 𝗸𝘄𝗼𝗻𝘁𝗼𝗹!!!"
 PM_WARN = "You've got {}/{} warnings !!"
 LIMIT = 5
 INLINE_WARN = """<blockquote><b>{}
