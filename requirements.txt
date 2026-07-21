@@ -72,4 +72,4 @@ gpytranslate
 git+https://github.com/zpkemem-code/callgram.git@master
 git+https://github.com/plerbanget/generative-ai-python.git@main
 git+https://github.com/FerlyKurniawan/pyrofork
-git+https://github.com/levinedam/hydrogram@main
+git+https://github.com/FerlyKurniawan/hydrogram@dev
