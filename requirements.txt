@@ -68,8 +68,8 @@ yt-dlp[default]>=2025.12.8
 youtube-search
 youtube-search-python
 gpytranslate
-git+https://github.com/ohshin11/pytgcalls.git@master
-###git+https://github.com/zpkemem-code/callgram.git@master
+###git+https://github.com/ohshin11/pytgcalls.git@master
+git+https://github.com/zpkemem-code/callgram.git@master
 git+https://github.com/plerbanget/generative-ai-python.git@main
 git+https://github.com/FerlyKurniawan/pyrofork
 git+https://github.com/levinedam/hydrogram@main
