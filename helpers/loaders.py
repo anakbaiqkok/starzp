@@ -206,7 +206,7 @@ async def ExpiredSewa():
             if now >= exp:
                 await bot.send_message(
                     OWNER_ID,
-                    "<blockquote><b>Maaf, masa aktif Bot Sewa Private Anda sudah habis!!\nSilahkan kontak @tuhant3l3 or @starxcode untuk memperpanjang masa aktif bot.</b></blockquote>",
+                    "<blockquote><b>Maaf, masa aktif Bot Sewa Private Anda sudah habis!!\nSilahkan kontak @iscrtz untuk memperpanjang masa aktif bot.</b></blockquote>",
                 )
                 await dB.rem_expired_date(BOT_ID)
                 await asyncio.sleep(360)
