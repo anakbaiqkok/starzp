@@ -279,15 +279,32 @@ class Quotly:
             emoji_status = ""
         return emoji_status
 
-    async def quotly(payload):
-        r = await Tools.fetch.post(
-            "https://bot.lyo.su/quote/generate.png", json=payload
-        )
+    @staticmethod
+    async def quotly_api(payload):
+        url_main = "https://bot.lyo.su/quote/generate.png"
+        url_fallback = "https://api.quotly.io/generate"
 
-        if not r.is_error:
-            return r.read()
-        else:
-            raise QuotlyException(r.json())
+        # API utama
+        try:
+            r = await Tools.fetch.post(url_main, json=payload)
+            if r.status_code == 200:
+                return r.read()
+        except:
+            pass
+
+        # API fallback
+        async with aiohttp.ClientSession() as ses:
+            async with ses.post(url_fallback, json=payload) as resp:
+                if resp.status != 200:
+                    raise QuotlyException(f"API Quotly Error: {resp.status}")
+                return await resp.read()
+
+    # ----------------------------------------
+    #  COMPAT: method lama `quotly()`
+    # ----------------------------------------
+    @staticmethod
+    async def quotly(payload):
+        return await Quotly.quotly_api(payload)
 
     @staticmethod
     async def make_carbonara(
