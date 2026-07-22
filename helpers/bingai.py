@@ -168,7 +168,7 @@ class AsyncImageGenerator:
             logger.info(f"Generated {len(images)} images in {duration} seconds.")
             return images[:num_images]
 
-        async def _submit_prompt(
+    async def _submit_prompt(
         self, client: httpx.AsyncClient, prompt: str
     ) -> Optional[str]:
         for attempt in range(2):
@@ -184,13 +184,10 @@ class AsyncImageGenerator:
                         logger.error(f"Attempt {attempt+1}: Cookie kadaluarsa atau butuh CAPTCHA.")
                         return None
                         
-                    # Perbaikan: Mencari ID numerik/karakter unik dari dalam teks HTML respons Bing
-                    # Struktur ID Bing biasanya berupa deretan karakter alphanumerik atau UUID tanpa simbol khusus
                     id_match = re.search(r'id=([a-zA-Z0-9\-_\.]+)', resp.text)
                     if id_match:
                         return id_match.group(1)
                     
-                    # Cek jika id tertera pada parameter URL akhir setelah pengalihan otomatis
                     if "id=" in str(resp.url):
                         return self._extract_result_id(str(resp.url))
 
@@ -207,13 +204,12 @@ class AsyncImageGenerator:
         return None
 
     def _extract_result_id(self, location: str) -> str:
-        # Perbaikan: Regex yang lebih ketat untuk mengambil nilai setelah 'id=' hingga bertemu simbol '&' atau batas string
         match = re.search(r'id=([a-zA-Z0-9\-_\.]+)', location)
         if match:
             return match.group(1)
-        # Fallback split lama jika regex tidak cocok, bersihkan dari string trailing non-alphanumeric
         clean_id = location.split("id=")[-1].split("&")[0]
         return re.sub(r'[^a-zA-Z0-9\-_\.]', '', clean_id)
+
 
 
     def _extract_image_urls(self, html: str) -> List[str]:
