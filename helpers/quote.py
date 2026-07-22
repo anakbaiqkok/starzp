@@ -281,7 +281,7 @@ class Quotly:
 
     @staticmethod
     async def quotly(payload):
-        url_main = "https://bot.lyo.su/quote/generate.png"
+        url_main = "https://quote.yuri.ly/quote/generate.png"
         url_fallback = "https://api.quotly.io/generate"
 
         # API utama
