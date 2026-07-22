@@ -91,42 +91,49 @@ class AsyncImageGenerator:
     BASE_URL = "https://www.bing.com"
 
     def __init__(self, auth_cookie_u: str, auth_cookie_srchhpgusr: str):
-        self.cookies = {
+                self.cookies = {
             "_U": auth_cookie_u,
             "SRCHHPGUSR": auth_cookie_srchhpgusr,
         }
-self.headers = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/120.0.0.0 Safari/537.36"
-    ),
-    "Accept": (
-        "text/html,application/xhtml+xml,application/xml;"
-        "q=0.9,image/avif,image/webp,*/*;q=0.8"
-    ),
-    "Accept-Language": "en-US,en;q=0.9",
-    "Referer": "https://www.bing.com/",
-    "Sec-Fetch-Dest": "document",
-    "Sec-Fetch-Mode": "navigate",
-    "Sec-Fetch-Site": "same-origin",
-}
+
+        self.headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
+            ),
+            "Accept": (
+                "text/html,application/xhtml+xml,application/xml;"
+                "q=0.9,image/avif,image/webp,*/*;q=0.8"
+            ),
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.bing.com/",
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "same-origin",
+        }
 
     async def _get_ig_value(self, client: httpx.AsyncClient) -> str | None:
         try:
-resp = await client.get(
-    f"{self.BASE_URL}/images/create",
-    follow_redirects=True
-)
-logger.info(f"Final URL: {resp.url}")
-logger.info(f"Status: {resp.status_code}")
-logger.info(resp.text[:300])
+            resp = await client.get(
+                f"{self.BASE_URL}/images/create",
+                follow_redirects=True
+            )
+
+            logger.info(f"Final URL: {resp.url}")
+            logger.info(f"Status: {resp.status_code}")
+            logger.info(resp.text[:300])
+
             match = re.search(r'IG:"([A-Z0-9]+)"', resp.text)
+
             if match:
                 return match.group(1)
+
             logger.warning("IG tidak ditemukan di halaman /images/create.")
+
         except httpx.RequestError as e:
             logger.error(f"Gagal mengambil IG: {e}")
+
         return None
 
     async def generate(
