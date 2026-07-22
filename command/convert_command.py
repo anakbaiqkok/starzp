@@ -783,7 +783,7 @@ async def qoutly_cmd(client, message):
             
         hasil = await Quotly.quotly(payload)
         bio_sticker = BytesIO(hasil)
-        bio_sticker.name = "biosticker.webp"
+        bio_sticker.name = "biosticker.png"
         await message.reply_sticker(bio_sticker)
         await pros.delete()
 
