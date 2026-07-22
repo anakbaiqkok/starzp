@@ -281,14 +281,24 @@ class Quotly:
 
     @staticmethod
     async def quotly(payload):
-        r = await Tools.fetch.post(
-            "https://quote.yuri.ly/quote/generate.png", json=payload
-        )
+        # Endpoint alternatif jika yuri.ly mengalami gangguan struktural
+        url = "https://lyo.su" 
+        
+        # Hapus properti type jika menggunakan yuri.ly (opsional, tergantung config bot Anda)
+        # if "type" in payload: del payload["type"]
+
+        r = await Tools.fetch.post(url, json=payload)
 
         if not r.is_error:
             return r.read()
         else:
-            raise QuotlyException(r.json())
+            # Cegah crash JSON decode dengan try-except
+            try:
+                error_data = r.json()
+            except Exception:
+                error_data = f"HTML/Raw Error: {r.text[:200]}"
+            raise QuotlyException(error_data)
+
     
     @staticmethod
     async def make_carbonara(
