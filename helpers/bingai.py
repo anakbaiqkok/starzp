@@ -22,6 +22,8 @@ class Bing:
 
     def _load_cookies(self, cookies_file: str) -> List[Dict[str, str]]:
         with open(cookies_file, "r", encoding="utf-8") as file:
+            # Tambahkan print ini sebelum baris 10
+            print(response.text) 
             return json.load(file)
 
     def get_next_cookie(self) -> Optional[Dict[str, str]]:
