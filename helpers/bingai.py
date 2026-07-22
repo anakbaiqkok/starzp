@@ -183,7 +183,7 @@ class AsyncImageGenerator:
             logger.info(f"Generated {len(images)} images in {duration} seconds.")
             return images[:num_images]
 
-    async def _submit_prompt(
+async def _submit_prompt(
     self, client: httpx.AsyncClient, prompt: str
 ) -> Optional[str]:
 
@@ -207,12 +207,12 @@ class AsyncImageGenerator:
                 f"Submit status={resp.status_code}, url={resp.url}"
             )
 
-            # cara lama
+            logger.info(resp.text[:1000])
+
+            # cek URL hasil
             if "images/create/" in str(resp.url):
                 return str(resp.url)
 
-
-            # cari URL hasil dari HTML
             match = re.search(
                 r'/images/create/[^"\']+',
                 resp.text
@@ -223,19 +223,28 @@ class AsyncImageGenerator:
                 logger.info(f"Found URL: {redirect}")
                 return redirect
 
-
             logger.warning(
                 f"Attempt {attempt+1}: URL hasil tidak ditemukan"
             )
 
             await asyncio.sleep(2)
-        logger.info(resp.text[:1000])
+
         except httpx.RequestError as e:
             logger.error(f"Submit error: {e}")
+            await asyncio.sleep(2)
 
     return None
 
    def _extract_result_id(self, location: str) -> str:
+    match = re.search(
+        r'/images/create/([^/?]+)',
+        location
+    )
+
+    if match:
+        return match.group(1)
+
+def _extract_result_id(self, location: str) -> str:
     match = re.search(
         r'/images/create/([^/?]+)',
         location
