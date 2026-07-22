@@ -624,168 +624,30 @@ async def qoutly_cmd(client, message):
 
     try:
         if not cmd:
-            payload = {
-                "type": "quote",
-                "format": "png",
-                "backgroundColor": get_color(),
-                "messages": [],
-            }
-            sid, title, name = await Quotly.forward_info(reply_msg)
-            messages_json = {
-                "entities": Tools.get_msg_entities(reply_msg),
-                "avatar": True,
-                "from": {
-                    "id": sid,
-                    "first_name": name,          # PERBAIKAN: Gunakan first_name menggantikan name/title
-                    "last_name": "",             # Wajib ada untuk skema API
-                    "username": getattr(reply_msg.from_user, "username", "") if reply_msg.from_user else "",
-                    "emoji_status": await Quotly.get_emoji(reply_msg),
-                },
-                "text": await Quotly.t_or_c(reply_msg),
-                "replyMessage": {},
-            }
-            payload["messages"].append(messages_json)
-        elif cmd[0].startswith("@"):
-            color = get_color(1)
-            include_reply = len(cmd) > 2 and cmd[2] == "-r"
-            payload = {
-                "type": "quote",
-                "format": "png",
-                "backgroundColor": color,
-                "messages": [],
-            }
-            username = cmd[0][1:]
-            user = await client.get_users(username)
-            if user.id in SUDO_OWNERS:
-                return await pros.edit(f"{em.gagal}**You can't quote this user**")
+payload = {
+        "messages": [{
+            "from": {
+                "id": 1,
+                "name": "User"
+            },
+            "text": "Hello world!"
+        }]
+    }
 
-            fake_msg = user
-            name = fake_msg.first_name
-            if fake_msg.last_name:
-                name += f" {fake_msg.last_name}"
+    try:
+        r = requests.post('https://quote.yuri.ly/quote/generate', json=payload)
+        data = r.json()
+        if 'error' in data:
+            print(f"Error: {data['error']}")
+            return
 
-            emoji_status = None
-            if fake_msg.emoji_status:
-                emoji_status = str(fake_msg.emoji_status.custom_emoji_id)
+        img = base64.b64decode(data['image'])
+        with open('simple-quote.png', 'wb') as f:
+            f.write(img)
+        print("Saved simple-quote.png")
+    except Exception as e:
+        print(f"Request failed: {str(e)}")
 
-            if include_reply:
-                replied = reply_msg.reply_to_message
-                reply_message = Quotly.parse_reply_info(replied)
-            else:
-                reply_message = {}
-
-            messages_json = {
-                "entities": Tools.get_msg_entities(reply_msg),
-                "avatar": True,
-                "from": {
-                    "id": fake_msg.id,
-                    "first_name": name,          # PERBAIKAN: Diubah ke standar API
-                    "last_name": fake_msg.last_name or "",
-                    "username": fake_msg.username or "",
-                    "emoji_status": emoji_status,
-                },
-                "text": await Quotly.t_or_c(reply_msg),
-                "replyMessage": reply_message,
-            }
-
-            payload["messages"].append(messages_json)
-        elif cmd[0].startswith("-r"):
-            replied = reply_msg.reply_to_message
-            reply_message = Quotly.parse_reply_info(replied)
-            payload = {
-                "type": "quote",
-                "format": "png",
-                "backgroundColor": get_color(1),
-                "messages": [],
-            }
-            sid, title, name = await Quotly.forward_info(reply_msg)
-            messages_json = {
-                "entities": Tools.get_msg_entities(reply_msg),
-                "avatar": True,
-                "from": {
-                    "id": sid,
-                    "first_name": name,          # PERBAIKAN: Diubah ke standar API
-                    "last_name": "",
-                    "username": getattr(reply_msg.from_user, "username", "") if reply_msg.from_user else "",
-                    "emoji_status": await Quotly.get_emoji(reply_msg),
-                },
-                "text": await Quotly.t_or_c(reply_msg),
-                "replyMessage": reply_message,
-            }
-            payload["messages"].append(messages_json)
-        elif cmd[0].isdigit():
-            payload = {
-                "type": "quote",
-                "format": "png",
-                "backgroundColor": get_color(1),
-                "messages": [],
-                "scale": 2,
-            }
-            sid, title, name = await Quotly.forward_info(reply_msg)
-            messages_json = {
-                "entities": Tools.get_msg_entities(reply_msg),
-                "avatar": True,
-                "from": {
-                    "id": sid,
-                    "first_name": name,          # PERBAIKAN: Diubah ke standar API
-                    "last_name": "",
-                    "username": getattr(reply_msg.from_user, "username", "") if reply_msg.from_user else "",
-                    "emoji_status": await Quotly.get_emoji(reply_msg),
-                },
-                "text": await Quotly.t_or_c(reply_msg),
-                "replyMessage": {},
-            }
-            payload["messages"].append(messages_json)
-            count = int(cmd[0])
-            if count > 10:
-                return await pros.edit(f"{em.gagal}**Max 10 messages**")
-            async for msg in client.get_chat_history(
-                reply_msg.chat.id, limit=count, offset_id=reply_msg.id
-            ):
-                sid, title, name = await Quotly.forward_info(msg)
-                messages_json = {
-                    "entities": Tools.get_msg_entities(msg),
-                    "avatar": True,
-                    "from": {
-                        "id": sid,
-                        "first_name": name,      # PERBAIKAN: Diubah ke standar API
-                        "last_name": "",
-                        "username": getattr(msg.from_user, "username", "") if msg.from_user else "",
-                        "emoji_status": await Quotly.get_emoji(msg),
-                    },
-                    "text": await Quotly.t_or_c(msg),
-                    "replyMessage": {},
-                }
-                payload["messages"].append(messages_json)
-            payload["messages"].reverse()
-        else:
-            payload = {
-                "type": "quote",
-                "format": "png",
-                "backgroundColor": cmd[0],
-                "messages": [],
-            }
-            sid, title, name = await Quotly.forward_info(reply_msg)
-            messages_json = {
-                "entities": Tools.get_msg_entities(reply_msg),
-                "avatar": True,
-                "from": {
-                    "id": sid,
-                    "first_name": name,          # PERBAIKAN: Diubah ke standar API
-                    "last_name": "",
-                    "username": getattr(reply_msg.from_user, "username", "") if reply_msg.from_user else "",
-                    "emoji_status": await Quotly.get_emoji(reply_msg),
-                },
-                "text": await Quotly.t_or_c(reply_msg),
-                "replyMessage": {},              # Ditambahkan agar skema valid
-            }
-            payload["messages"].append(messages_json)
-            
-        hasil = await Quotly.quotly(payload)
-        bio_sticker = BytesIO(hasil)
-        bio_sticker.name = "biosticker.png"
-        await message.reply_sticker(bio_sticker)
-        await pros.delete()
 
     except Exception as e:
         print(f"ERROR: {traceback.format_exc()}")
