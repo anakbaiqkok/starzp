@@ -280,7 +280,7 @@ class Quotly:
         return emoji_status
 
     @staticmethod
-    async def quotly_api(payload):
+    async def quotly(payload):
         url_main = "https://bot.lyo.su/quote/generate.png"
         url_fallback = "https://api.quotly.io/generate"
 
@@ -298,14 +298,7 @@ class Quotly:
                 if resp.status != 200:
                     raise QuotlyException(f"API Quotly Error: {resp.status}")
                 return await resp.read()
-
-    # ----------------------------------------
-    #  COMPAT: method lama `quotly()`
-    # ----------------------------------------
-    @staticmethod
-    async def quotly(payload):
-        return await Quotly.quotly_api(payload)
-
+    
     @staticmethod
     async def make_carbonara(
         code: str, bg_color: str, theme: str, language: str
