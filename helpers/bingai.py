@@ -135,16 +135,18 @@ class AsyncImageGenerator:
                 if len(images) >= num_images:
                     break
 
-                redirect_url = await self._submit_prompt(client, prompt)
-                if not redirect_url:
-                    logger.warning(f"[Cycle {cycle}] Gagal mendapatkan redirect URL.")
+                # Sekarang langsung mengembalikan ID murni atau None
+                result_id = await self._submit_prompt(client, prompt) 
+                if not result_id:
+                    logger.warning(f"[Cycle {cycle}] Gagal mendapatkan result_id.")
                     continue
 
-                result_id = self._extract_result_id(redirect_url)
+                # Menyusun URL polling dengan ID murni yang sudah bersih
                 results_url = (
                     f"{self.BASE_URL}/images/create/async/results/{result_id}"
                     f"?q={prompt}&IG={ig_value}&IID=images.as"
                 )
+
 
                 async for html in self._wait_for_results(
                     client, results_url, timeout=200
@@ -166,7 +168,7 @@ class AsyncImageGenerator:
             logger.info(f"Generated {len(images)} images in {duration} seconds.")
             return images[:num_images]
 
-    async def _submit_prompt(
+        async def _submit_prompt(
         self, client: httpx.AsyncClient, prompt: str
     ) -> Optional[str]:
         for attempt in range(2):
@@ -174,30 +176,26 @@ class AsyncImageGenerator:
                 resp = await client.post(
                     f"{self.BASE_URL}/images/create?q={prompt}&rt=4&mdl=0&FORM=GENCRE",
                     data={"q": prompt, "qs": "ds"},
-                    follow_redirects=True, # Biarkan httpx menangani jika ada redirect internal
+                    follow_redirects=True,
                 )
                 
-                # Kasus 1: Bing merespons dengan 200 OK (Struktur Baru)
                 if resp.status_code == 200:
-                    # Periksa apakah ini halaman blokir/CAPTCHA
                     if "authns" in resp.text or "snrerror" in resp.text:
-                        logger.error(f"Attempt {attempt+1}: Cookie kemungkinan diblokir atau butuh CAPTCHA.")
+                        logger.error(f"Attempt {attempt+1}: Cookie kadaluarsa atau butuh CAPTCHA.")
                         return None
                         
-                    # Ekstrak ID langsung dari isi teks HTML menggunakan Regex
-                    # Bing biasanya menyimpan ID di dalam parameter URL atau payload json internal text
-                    id_match = re.search(r'id=([^"& \?]+)', resp.text)
+                    # Perbaikan: Mencari ID numerik/karakter unik dari dalam teks HTML respons Bing
+                    # Struktur ID Bing biasanya berupa deretan karakter alphanumerik atau UUID tanpa simbol khusus
+                    id_match = re.search(r'id=([a-zA-Z0-9\-_\.]+)', resp.text)
                     if id_match:
-                        # Buat format URL tiruan agar fungsi _extract_result_id bawaan Anda tetap bekerja
-                        return f"https://bing.com{id_match.group(1)}"
+                        return id_match.group(1)
                     
-                    # Alternatif ekstraksi jika ID berada di parameter URL akhir setelah follow_redirects
+                    # Cek jika id tertera pada parameter URL akhir setelah pengalihan otomatis
                     if "id=" in str(resp.url):
-                        return str(resp.url)
+                        return self._extract_result_id(str(resp.url))
 
-                # Kasus 2: Bing tetap merespons menggunakan skema lama 302/301 (Fallback)
                 elif resp.status_code in (301, 302) and resp.headers.get("Location"):
-                    return resp.headers["Location"]
+                    return self._extract_result_id(resp.headers["Location"])
 
                 logger.warning(
                     f"Attempt {attempt+1}: Gagal mengenali format respons, status {resp.status_code}"
@@ -208,9 +206,15 @@ class AsyncImageGenerator:
                 await asyncio.sleep(1)
         return None
 
-
     def _extract_result_id(self, location: str) -> str:
-        return location.split("id=")[-1].split("&")[0]
+        # Perbaikan: Regex yang lebih ketat untuk mengambil nilai setelah 'id=' hingga bertemu simbol '&' atau batas string
+        match = re.search(r'id=([a-zA-Z0-9\-_\.]+)', location)
+        if match:
+            return match.group(1)
+        # Fallback split lama jika regex tidak cocok, bersihkan dari string trailing non-alphanumeric
+        clean_id = location.split("id=")[-1].split("&")[0]
+        return re.sub(r'[^a-zA-Z0-9\-_\.]', '', clean_id)
+
 
     def _extract_image_urls(self, html: str) -> List[str]:
         return [
