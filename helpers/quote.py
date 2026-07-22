@@ -279,25 +279,15 @@ class Quotly:
             emoji_status = ""
         return emoji_status
 
-    @staticmethod
     async def quotly(payload):
-        # Endpoint alternatif jika yuri.ly mengalami gangguan struktural
-        url = "https://quote.yuri.ly/quote/generate.png" 
-        
-        # Hapus properti type jika menggunakan yuri.ly (opsional, tergantung config bot Anda)
-        # if "type" in payload: del payload["type"]
-
-        r = await Tools.fetch.post(url, json=payload)
+        r = await Tools.fetch.post(
+            "https://quote.yuri.ly/quote/generate", json=payload
+        )
 
         if not r.is_error:
             return r.read()
         else:
-            # Cegah crash JSON decode dengan try-except
-            try:
-                error_data = r.json()
-            except Exception:
-                error_data = f"HTML/Raw Error: {r.text[:200]}"
-            raise QuotlyException(error_data)
+            raise QuotlyException(r.json())
 
     
     @staticmethod
