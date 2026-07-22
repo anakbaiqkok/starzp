@@ -20,11 +20,22 @@ class Bing:
         random.shuffle(self.shuffled_cookies)
         self.current_index = 0
 
-    def _load_cookies(self, cookies_file: str) -> List[Dict[str, str]]:
+        def _load_cookies(self, cookies_file: str) -> List[Dict[str, str]]:
         with open(cookies_file, "r", encoding="utf-8") as file:
-            # Tambahkan print ini sebelum baris 10
-            print(response.text) 
-            return json.load(file)
+            isi_file = file.read()
+            
+            # Jika file kosong
+            if not isi_file.strip():
+                raise ValueError(f"Error: File {cookies_file} kosong!")
+                
+            try:
+                return json.loads(isi_file)
+            except json.JSONDecodeError as e:
+                print("\n--- ISI FILE YANG RUSAK (BUKAN JSON) ---")
+                print(isi_file[:500]) # Cetak 500 karakter pertama untuk dicek
+                print("----------------------------------------\n")
+                raise ValueError(f"File {cookies_file} bukan format JSON yang valid: {e}")
+
 
     def get_next_cookie(self) -> Optional[Dict[str, str]]:
         if self.current_index >= len(self.shuffled_cookies):
