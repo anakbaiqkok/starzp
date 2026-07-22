@@ -1,92 +1,3 @@
-import asyncio
-import hashlib
-import json
-import os
-import random
-import re
-from collections import OrderedDict
-from typing import Dict, List, Optional
-
-import aiofiles
-import httpx
-
-from logs import logger
-
-
-class Bing:
-    def __init__(self, cookies_file: str):
-        self.cookies = self._load_cookies(cookies_file)
-        self.shuffled_cookies = self.cookies.copy()
-        random.shuffle(self.shuffled_cookies)
-        self.current_index = 0
-
-    def _load_cookies(self, cookies_file: str) -> List[Dict[str, str]]:
-        with open(cookies_file, "r", encoding="utf-8") as file:
-            return json.load(file)
-
-    def get_next_cookie(self) -> Optional[Dict[str, str]]:
-        if self.current_index >= len(self.shuffled_cookies):
-            return None
-        cookie = self.shuffled_cookies[self.current_index]
-        self.current_index += 1
-        return cookie
-
-    def reset(self):
-        self.shuffled_cookies = self.cookies.copy()
-        random.shuffle(self.shuffled_cookies)
-        self.current_index = 0
-
-    @staticmethod
-    async def generate_images(
-        folder_name: str, prompt: str, max_global_retries: int = 5
-    ):
-        prompt_clean = re.sub(r"[^\x20-\x7E]", "", prompt.strip())
-        cookies_file = "storage/cookies/bing/bing.json"
-        gen = Bing(cookies_file)
-        retries = 0
-
-        while retries < max_global_retries:
-            cuki = gen.get_next_cookie()
-            if cuki is None:
-                logger.warning("Semua cookie sudah dicoba, reset ulang.")
-                gen.reset()
-                retries += 1
-                continue
-
-            luci = AsyncImageGenerator(
-                auth_cookie_u=cuki["auth_cookie_u"],
-                auth_cookie_srchhpgusr=cuki["auth_cookie_srchhpgusr"],
-            )
-
-            try:
-                images = await luci.generate(
-                    prompt=prompt_clean, num_images=4, max_cycles=4
-                )
-                if not images:
-                    logger.warning(
-                        "Tidak ada gambar yang dihasilkan, lanjut cookie berikutnya."
-                    )
-                    continue
-
-                await luci.save(images, output_dir=folder_name)
-                files = [
-                    os.path.join(folder_name, f)
-                    for f in os.listdir(folder_name)
-                    if f.endswith(".jpeg")
-                ]
-
-                if files:
-                    gen.reset()
-                    return folder_name, files
-
-            except Exception as e:
-                logger.error(f"Error: {e}")
-                continue
-
-        logger.error("Gagal menghasilkan gambar setelah semua retry.")
-        return None, None
-
-
 class AsyncImageGenerator:
     BASE_URL = "https://www.bing.com"
 
@@ -107,7 +18,8 @@ class AsyncImageGenerator:
 
     async def _get_ig_value(self, client: httpx.AsyncClient) -> str | None:
         try:
-            resp = await client.get(f"{self.BASE_URL}/images/create")
+            # Perbaikan: Tambahkan follow_redirects=True untuk melewati HTTP 301
+            resp = await client.get(f"{self.BASE_URL}/images/create", follow_redirects=True)
             match = re.search(r'IG:"([A-Z0-9]+)"', resp.text)
             if match:
                 return match.group(1)
@@ -170,16 +82,20 @@ class AsyncImageGenerator:
     ) -> Optional[str]:
         for attempt in range(2):
             try:
+                # Perbaikan: Tambahkan follow_redirects=True jika endpoint ini juga ikut berubah
                 resp = await client.post(
                     f"{self.BASE_URL}/images/create?q={prompt}&rt=4&mdl=0&FORM=GENCRE",
                     data={"q": prompt, "qs": "ds"},
-                    follow_redirects=False,
+                    follow_redirects=True, 
                 )
-                if resp.status_code == 302 and resp.headers.get("Location"):
-                    return resp.headers["Location"]
+                
+                # Jika mengikuti redirect, status sukses akhir biasanya adalah 200 OK.
+                # Kita perlu membaca URL akhir dari resp.url untuk mendapatkan result ID.
+                if resp.status_code == 200 and "id=" in str(resp.url):
+                    return str(resp.url)
 
                 logger.warning(
-                    f"Attempt {attempt+1}: Tidak ada redirect, status {resp.status_code}"
+                    f"Attempt {attempt+1}: Struktur respons berubah, status {resp.status_code}"
                 )
                 await asyncio.sleep(1)
             except httpx.RequestError as e:
@@ -219,13 +135,21 @@ class AsyncImageGenerator:
                 except Exception as e:
                     logger.warning(f"Failed to save {url}: {e}")
 
+    # Melanjutkan fungsi Anda yang terpotong di akhir pesan
     async def _wait_for_results(
         self, client: httpx.AsyncClient, url: str, timeout: int
     ):
         elapsed_time = 0
+        interval = 3
         while elapsed_time < timeout:
-            response = await client.get(url)
-            if response.status_code == 200 and "errorMessage" not in response.text:
-                yield response.text
-            await asyncio.sleep(1)
-            elapsed_time += 1
+            try:
+                response = await client.get(url)
+                if response.status_code == 200:
+                    yield response.text
+                    if "current_status" not in response.text: # Sesuaikan indikator selesai
+                        break
+            except httpx.RequestError as e:
+                logger.error(f"Polling error: {e}")
+            
+            await asyncio.sleep(interval)
+            elapsed_time += interval
