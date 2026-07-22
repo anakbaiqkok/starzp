@@ -282,7 +282,7 @@ class Quotly:
     @staticmethod
     async def quotly(payload):
         # Endpoint alternatif jika yuri.ly mengalami gangguan struktural
-        url = "https://lyo.su" 
+        url = "https://quote.yuri.ly/quote/generate.png" 
         
         # Hapus properti type jika menggunakan yuri.ly (opsional, tergantung config bot Anda)
         # if "type" in payload: del payload["type"]
