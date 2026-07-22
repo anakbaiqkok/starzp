@@ -279,6 +279,7 @@ class Quotly:
             emoji_status = ""
         return emoji_status
 
+@staticmethod
 async def quotly(payload):
     # PERBAIKAN 1: Mengubah URL endpoint ke yang valid tanpa ekstensi .png
     r = await Tools.fetch.post(
