@@ -636,8 +636,9 @@ async def qoutly_cmd(client, message):
                 "avatar": True,
                 "from": {
                     "id": sid,
-                    "title": title,
-                    "name": name,
+                    "first_name": name,          # PERBAIKAN: Gunakan first_name menggantikan name/title
+                    "last_name": "",             # Wajib ada untuk skema API
+                    "username": getattr(reply_msg.from_user, "username", "") if reply_msg.from_user else "",
                     "emoji_status": await Quotly.get_emoji(reply_msg),
                 },
                 "text": await Quotly.t_or_c(reply_msg),
@@ -678,8 +679,9 @@ async def qoutly_cmd(client, message):
                 "avatar": True,
                 "from": {
                     "id": fake_msg.id,
-                    "title": name,
-                    "name": name,
+                    "first_name": name,          # PERBAIKAN: Diubah ke standar API
+                    "last_name": fake_msg.last_name or "",
+                    "username": fake_msg.username or "",
                     "emoji_status": emoji_status,
                 },
                 "text": await Quotly.t_or_c(reply_msg),
@@ -702,8 +704,9 @@ async def qoutly_cmd(client, message):
                 "avatar": True,
                 "from": {
                     "id": sid,
-                    "title": title,
-                    "name": name,
+                    "first_name": name,          # PERBAIKAN: Diubah ke standar API
+                    "last_name": "",
+                    "username": getattr(reply_msg.from_user, "username", "") if reply_msg.from_user else "",
                     "emoji_status": await Quotly.get_emoji(reply_msg),
                 },
                 "text": await Quotly.t_or_c(reply_msg),
@@ -724,8 +727,9 @@ async def qoutly_cmd(client, message):
                 "avatar": True,
                 "from": {
                     "id": sid,
-                    "title": title,
-                    "name": name,
+                    "first_name": name,          # PERBAIKAN: Diubah ke standar API
+                    "last_name": "",
+                    "username": getattr(reply_msg.from_user, "username", "") if reply_msg.from_user else "",
                     "emoji_status": await Quotly.get_emoji(reply_msg),
                 },
                 "text": await Quotly.t_or_c(reply_msg),
@@ -744,8 +748,9 @@ async def qoutly_cmd(client, message):
                     "avatar": True,
                     "from": {
                         "id": sid,
-                        "title": title,
-                        "name": name,
+                        "first_name": name,      # PERBAIKAN: Diubah ke standar API
+                        "last_name": "",
+                        "username": getattr(msg.from_user, "username", "") if msg.from_user else "",
                         "emoji_status": await Quotly.get_emoji(msg),
                     },
                     "text": await Quotly.t_or_c(msg),
@@ -766,13 +771,16 @@ async def qoutly_cmd(client, message):
                 "avatar": True,
                 "from": {
                     "id": sid,
-                    "title": title,
-                    "name": name,
+                    "first_name": name,          # PERBAIKAN: Diubah ke standar API
+                    "last_name": "",
+                    "username": getattr(reply_msg.from_user, "username", "") if reply_msg.from_user else "",
                     "emoji_status": await Quotly.get_emoji(reply_msg),
                 },
                 "text": await Quotly.t_or_c(reply_msg),
+                "replyMessage": {},              # Ditambahkan agar skema valid
             }
             payload["messages"].append(messages_json)
+            
         hasil = await Quotly.quotly(payload)
         bio_sticker = BytesIO(hasil)
         bio_sticker.name = "biosticker.webp"
@@ -782,7 +790,6 @@ async def qoutly_cmd(client, message):
     except Exception as e:
         print(f"ERROR: {traceback.format_exc()}")
         return await pros.edit(f"{em.gagal}{e}")
-
 
 async def textgen_cmd(client, message):
     em = Emoji(client)
