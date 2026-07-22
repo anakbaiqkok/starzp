@@ -107,8 +107,7 @@ class AsyncImageGenerator:
 
     async def _get_ig_value(self, client: httpx.AsyncClient) -> str | None:
         try:
-            # Perbaikan: Tambahkan follow_redirects=True untuk melewati HTTP 301
-            resp = await client.get(f"{self.BASE_URL}/images/create", follow_redirects=True)
+            resp = await client.get(f"{self.BASE_URL}/images/create")
             match = re.search(r'IG:"([A-Z0-9]+)"', resp.text)
             if match:
                 return match.group(1)
@@ -135,18 +134,16 @@ class AsyncImageGenerator:
                 if len(images) >= num_images:
                     break
 
-                # Sekarang langsung mengembalikan ID murni atau None
-                result_id = await self._submit_prompt(client, prompt) 
-                if not result_id:
-                    logger.warning(f"[Cycle {cycle}] Gagal mendapatkan result_id.")
+                redirect_url = await self._submit_prompt(client, prompt)
+                if not redirect_url:
+                    logger.warning(f"[Cycle {cycle}] Gagal mendapatkan redirect URL.")
                     continue
 
-                # Menyusun URL polling dengan ID murni yang sudah bersih
+                result_id = self._extract_result_id(redirect_url)
                 results_url = (
                     f"{self.BASE_URL}/images/create/async/results/{result_id}"
                     f"?q={prompt}&IG={ig_value}&IID=images.as"
                 )
-
 
                 async for html in self._wait_for_results(
                     client, results_url, timeout=200
@@ -176,26 +173,13 @@ class AsyncImageGenerator:
                 resp = await client.post(
                     f"{self.BASE_URL}/images/create?q={prompt}&rt=4&mdl=0&FORM=GENCRE",
                     data={"q": prompt, "qs": "ds"},
-                    follow_redirects=True,
+                    follow_redirects=False,
                 )
-                
-                if resp.status_code == 200:
-                    if "authns" in resp.text or "snrerror" in resp.text:
-                        logger.error(f"Attempt {attempt+1}: Cookie kadaluarsa atau butuh CAPTCHA.")
-                        return None
-                        
-                    id_match = re.search(r'id=([a-zA-Z0-9\-_\.]+)', resp.text)
-                    if id_match:
-                        return id_match.group(1)
-                    
-                    if "id=" in str(resp.url):
-                        return self._extract_result_id(str(resp.url))
-
-                elif resp.status_code in (301, 302) and resp.headers.get("Location"):
-                    return self._extract_result_id(resp.headers["Location"])
+                if resp.status_code == 302 and resp.headers.get("Location"):
+                    return resp.headers["Location"]
 
                 logger.warning(
-                    f"Attempt {attempt+1}: Gagal mengenali format respons, status {resp.status_code}"
+                    f"Attempt {attempt+1}: Tidak ada redirect, status {resp.status_code}"
                 )
                 await asyncio.sleep(1)
             except httpx.RequestError as e:
@@ -204,13 +188,7 @@ class AsyncImageGenerator:
         return None
 
     def _extract_result_id(self, location: str) -> str:
-        match = re.search(r'id=([a-zA-Z0-9\-_\.]+)', location)
-        if match:
-            return match.group(1)
-        clean_id = location.split("id=")[-1].split("&")[0]
-        return re.sub(r'[^a-zA-Z0-9\-_\.]', '', clean_id)
-
-
+        return location.split("id=")[-1].split("&")[0]
 
     def _extract_image_urls(self, html: str) -> List[str]:
         return [
@@ -241,22 +219,13 @@ class AsyncImageGenerator:
                 except Exception as e:
                     logger.warning(f"Failed to save {url}: {e}")
 
-    # Melanjutkan fungsi Anda yang terpotong di akhir pesan
     async def _wait_for_results(
         self, client: httpx.AsyncClient, url: str, timeout: int
     ):
         elapsed_time = 0
-        interval = 3
         while elapsed_time < timeout:
-            try:
-                response = await client.get(url)
-                if response.status_code == 200:
-                    yield response.text
-                    if "current_status" not in response.text: # Sesuaikan indikator selesai
-                        break
-            except httpx.RequestError as e:
-                logger.error(f"Polling error: {e}")
-            
-            await asyncio.sleep(interval)
-            elapsed_time += interval
-
+            response = await client.get(url)
+            if response.status_code == 200 and "errorMessage" not in response.text:
+                yield response.text
+            await asyncio.sleep(1)
+            elapsed_time += 1
