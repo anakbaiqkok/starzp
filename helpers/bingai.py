@@ -14,14 +14,14 @@ from logs import logger
 
 
 class Bing:
-    def __init__(self, "data.json": str):
-        self.cookies = self._load_cookies("data.json")
+    def __init__(self, cookies_file: str):
+        self.cookies = self._load_cookies(cookies_file)
         self.shuffled_cookies = self.cookies.copy()
         random.shuffle(self.shuffled_cookies)
         self.current_index = 0
 
-    def _load_cookies(self, "data.json": str) -> List[Dict[str, str]]:
-        with open("data.json", "r", encoding="utf-8") as file:
+    def _load_cookies(self, cookies_file: str) -> List[Dict[str, str]]:
+        with open(cookies_file, "r", encoding="utf-8") as file:
             return json.load(file)
 
     def get_next_cookie(self) -> Optional[Dict[str, str]]:
@@ -41,8 +41,8 @@ class Bing:
         folder_name: str, prompt: str, max_global_retries: int = 5
     ):
         prompt_clean = re.sub(r"[^\x20-\x7E]", "", prompt.strip())
-        "data.json" = "storage/cookies/bing/bing.json"
-        gen = Bing("data.json")
+        cookies_file = "storage/cookies/bing/bing.json"
+        gen = Bing(cookies_file)
         retries = 0
 
         while retries < max_global_retries:
