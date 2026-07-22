@@ -171,26 +171,43 @@ class AsyncImageGenerator:
     ) -> Optional[str]:
         for attempt in range(2):
             try:
-                # Perbaikan: Tambahkan follow_redirects=True jika endpoint ini juga ikut berubah
                 resp = await client.post(
                     f"{self.BASE_URL}/images/create?q={prompt}&rt=4&mdl=0&FORM=GENCRE",
                     data={"q": prompt, "qs": "ds"},
-                    follow_redirects=True, 
+                    follow_redirects=True, # Biarkan httpx menangani jika ada redirect internal
                 )
                 
-                # Jika mengikuti redirect, status sukses akhir biasanya adalah 200 OK.
-                # Kita perlu membaca URL akhir dari resp.url untuk mendapatkan result ID.
-                if resp.status_code == 200 and "id=" in str(resp.url):
-                    return str(resp.url)
+                # Kasus 1: Bing merespons dengan 200 OK (Struktur Baru)
+                if resp.status_code == 200:
+                    # Periksa apakah ini halaman blokir/CAPTCHA
+                    if "authns" in resp.text or "snrerror" in resp.text:
+                        logger.error(f"Attempt {attempt+1}: Cookie kemungkinan diblokir atau butuh CAPTCHA.")
+                        return None
+                        
+                    # Ekstrak ID langsung dari isi teks HTML menggunakan Regex
+                    # Bing biasanya menyimpan ID di dalam parameter URL atau payload json internal text
+                    id_match = re.search(r'id=([^"& \?]+)', resp.text)
+                    if id_match:
+                        # Buat format URL tiruan agar fungsi _extract_result_id bawaan Anda tetap bekerja
+                        return f"https://bing.com{id_match.group(1)}"
+                    
+                    # Alternatif ekstraksi jika ID berada di parameter URL akhir setelah follow_redirects
+                    if "id=" in str(resp.url):
+                        return str(resp.url)
+
+                # Kasus 2: Bing tetap merespons menggunakan skema lama 302/301 (Fallback)
+                elif resp.status_code in (301, 302) and resp.headers.get("Location"):
+                    return resp.headers["Location"]
 
                 logger.warning(
-                    f"Attempt {attempt+1}: Struktur respons berubah, status {resp.status_code}"
+                    f"Attempt {attempt+1}: Gagal mengenali format respons, status {resp.status_code}"
                 )
                 await asyncio.sleep(1)
             except httpx.RequestError as e:
                 logger.error(f"Submit error: {e}")
                 await asyncio.sleep(1)
         return None
+
 
     def _extract_result_id(self, location: str) -> str:
         return location.split("id=")[-1].split("&")[0]
