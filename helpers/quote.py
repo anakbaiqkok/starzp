@@ -279,27 +279,16 @@ class Quotly:
             emoji_status = ""
         return emoji_status
 
-@staticmethod
-async def quotly(payload):
-    # PERBAIKAN 1: Mengubah URL endpoint ke yang valid tanpa ekstensi .png
-    r = await Tools.fetch.post(
-        "https://bot.lyo.su/quote/generate", json=payload
-    )
+    async def quotly(payload):
+        r = await Tools.fetch.post(
+            "https://bot.lyo.su/quote/generate", json=payload
+        )
 
-    if not r.is_error:
-        res_json = r.json()
-        
-        # Validasi apakah response dari API LyoSU sukses secara struktural
-        if res_json.get("ok") and "result" in res_json:
-            # PERBAIKAN 2: Mengambil string base64 dan mendekodenya ke bytes gambar
-            base64_image = res_json["result"]["image"]
-            return base64.b64decode(base64_image)
+        if not r.is_error:
+            return r.read()
         else:
-            raise QuotlyException(f"API Error: {res_json}")
-    else:
-        raise QuotlyException(f"HTTP Error {r.status_code}: {r.text}")
+            raise QuotlyException(r.json())
 
-    
     @staticmethod
     async def make_carbonara(
         code: str, bg_color: str, theme: str, language: str
