@@ -97,21 +97,16 @@ class AsyncImageGenerator:
         }
 
         self.headers = {
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/120.0.0.0 Safari/537.36"
-            ),
-            "Accept": (
-                "text/html,application/xhtml+xml,application/xml;"
-                "q=0.9,image/avif,image/webp,*/*;q=0.8"
-            ),
-            "Accept-Language": "en-US,en;q=0.9",
-            "Referer": "https://www.bing.com/",
-            "Sec-Fetch-Dest": "document",
-            "Sec-Fetch-Mode": "navigate",
-            "Sec-Fetch-Site": "same-origin",
-        }
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 Chrome/120 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Referer": "https://www.bing.com/images/create",
+    "Origin": "https://www.bing.com",
+    "Content-Type": "application/x-www-form-urlencoded",
+}
 
     async def _get_ig_value(self, client: httpx.AsyncClient) -> str | None:
         try:
@@ -124,7 +119,10 @@ class AsyncImageGenerator:
             logger.info(f"Status: {resp.status_code}")
             logger.info(resp.text[:300])
 
-            match = re.search(r'IG:"([A-Z0-9]+)"', resp.text)
+            match = re.search(
+    r'(?:IG|ig)["\']?\s*[:=]\s*["\']([A-Z0-9]+)',
+    resp.text
+)
 
             if match:
                 return match.group(1)
@@ -186,29 +184,67 @@ class AsyncImageGenerator:
             return images[:num_images]
 
     async def _submit_prompt(
-        self, client: httpx.AsyncClient, prompt: str
-    ) -> Optional[str]:
-        for attempt in range(2):
-            try:
-                resp = await client.post(
-                    f"{self.BASE_URL}/images/create?q={prompt}&rt=4&mdl=0&FORM=GENCRE",
-                    data={"q": prompt, "qs": "ds"},
-                    follow_redirects=False,
-                )
-                if resp.status_code == 302 and resp.headers.get("Location"):
-                    return resp.headers["Location"]
+    self, client: httpx.AsyncClient, prompt: str
+) -> Optional[str]:
 
-                logger.warning(
-                    f"Attempt {attempt+1}: Tidak ada redirect, status {resp.status_code}"
-                )
-                await asyncio.sleep(1)
-            except httpx.RequestError as e:
-                logger.error(f"Submit error: {e}")
-                await asyncio.sleep(1)
-        return None
+    url = (
+        f"{self.BASE_URL}/images/create"
+        f"?q={prompt}&rt=4&mdl=0&FORM=GENCRE"
+    )
 
-    def _extract_result_id(self, location: str) -> str:
-        return location.split("id=")[-1].split("&")[0]
+    for attempt in range(3):
+        try:
+            resp = await client.post(
+                url,
+                data={
+                    "q": prompt,
+                    "qs": "ds",
+                },
+                follow_redirects=True,
+            )
+
+            logger.info(
+                f"Submit status={resp.status_code}, url={resp.url}"
+            )
+
+            # cara lama
+            if "images/create/" in str(resp.url):
+                return str(resp.url)
+
+
+            # cari URL hasil dari HTML
+            match = re.search(
+                r'/images/create/[^"\']+',
+                resp.text
+            )
+
+            if match:
+                redirect = self.BASE_URL + match.group(0)
+                logger.info(f"Found URL: {redirect}")
+                return redirect
+
+
+            logger.warning(
+                f"Attempt {attempt+1}: URL hasil tidak ditemukan"
+            )
+
+            await asyncio.sleep(2)
+        logger.info(resp.text[:1000])
+        except httpx.RequestError as e:
+            logger.error(f"Submit error: {e}")
+
+    return None
+
+   def _extract_result_id(self, location: str) -> str:
+    match = re.search(
+        r'/images/create/([^/?]+)',
+        location
+    )
+
+    if match:
+        return match.group(1)
+
+    return location.split("id=")[-1].split("&")[0]
 
     def _extract_image_urls(self, html: str) -> List[str]:
         return [
