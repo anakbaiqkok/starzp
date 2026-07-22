@@ -281,7 +281,7 @@ class Quotly:
 
     async def quotly(payload):
         r = await Tools.fetch.post(
-            "https://bot.lyo.su/quote/generate", json=payload
+            "https://quote.yuri.ly/quote/generate", json=payload
         )
 
         if not r.is_error:
