@@ -281,23 +281,14 @@ class Quotly:
 
     @staticmethod
     async def quotly(payload):
-        url_main = "https://quote.yuri.ly/quote/generate.png"
-        url_fallback = "https://api.quotly.io/generate"
+        r = await Tools.fetch.post(
+            "https://quote.yuri.ly/quote/generate.png", json=payload
+        )
 
-        # API utama
-        try:
-            r = await Tools.fetch.post(url_main, json=payload)
-            if r.status_code == 200:
-                return r.read()
-        except:
-            pass
-
-        # API fallback
-        async with aiohttp.ClientSession() as ses:
-            async with ses.post(url_fallback, json=payload) as resp:
-                if resp.status != 200:
-                    raise QuotlyException(f"API Quotly Error: {resp.status}")
-                return await resp.read()
+        if not r.is_error:
+            return r.read()
+        else:
+            raise QuotlyException(r.json())
     
     @staticmethod
     async def make_carbonara(
