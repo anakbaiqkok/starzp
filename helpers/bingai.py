@@ -91,7 +91,7 @@ class AsyncImageGenerator:
     BASE_URL = "https://www.bing.com"
 
     def __init__(self, auth_cookie_u: str, auth_cookie_srchhpgusr: str):
-                self.cookies = {
+        self.cookies = {
             "_U": auth_cookie_u,
             "SRCHHPGUSR": auth_cookie_srchhpgusr,
         }
