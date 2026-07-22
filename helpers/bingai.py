@@ -1,3 +1,92 @@
+import asyncio
+import hashlib
+import json
+import os
+import random
+import re
+from collections import OrderedDict
+from typing import Dict, List, Optional
+
+import aiofiles
+import httpx
+
+from logs import logger
+
+
+class Bing:
+    def __init__(self, cookies_file: str):
+        self.cookies = self._load_cookies(cookies_file)
+        self.shuffled_cookies = self.cookies.copy()
+        random.shuffle(self.shuffled_cookies)
+        self.current_index = 0
+
+    def _load_cookies(self, cookies_file: str) -> List[Dict[str, str]]:
+        with open(cookies_file, "r", encoding="utf-8") as file:
+            return json.load(file)
+
+    def get_next_cookie(self) -> Optional[Dict[str, str]]:
+        if self.current_index >= len(self.shuffled_cookies):
+            return None
+        cookie = self.shuffled_cookies[self.current_index]
+        self.current_index += 1
+        return cookie
+
+    def reset(self):
+        self.shuffled_cookies = self.cookies.copy()
+        random.shuffle(self.shuffled_cookies)
+        self.current_index = 0
+
+    @staticmethod
+    async def generate_images(
+        folder_name: str, prompt: str, max_global_retries: int = 5
+    ):
+        prompt_clean = re.sub(r"[^\x20-\x7E]", "", prompt.strip())
+        cookies_file = "storage/cookies/bing/bing.json"
+        gen = Bing(cookies_file)
+        retries = 0
+
+        while retries < max_global_retries:
+            cuki = gen.get_next_cookie()
+            if cuki is None:
+                logger.warning("Semua cookie sudah dicoba, reset ulang.")
+                gen.reset()
+                retries += 1
+                continue
+
+            luci = AsyncImageGenerator(
+                auth_cookie_u=cuki["auth_cookie_u"],
+                auth_cookie_srchhpgusr=cuki["auth_cookie_srchhpgusr"],
+            )
+
+            try:
+                images = await luci.generate(
+                    prompt=prompt_clean, num_images=4, max_cycles=4
+                )
+                if not images:
+                    logger.warning(
+                        "Tidak ada gambar yang dihasilkan, lanjut cookie berikutnya."
+                    )
+                    continue
+
+                await luci.save(images, output_dir=folder_name)
+                files = [
+                    os.path.join(folder_name, f)
+                    for f in os.listdir(folder_name)
+                    if f.endswith(".jpeg")
+                ]
+
+                if files:
+                    gen.reset()
+                    return folder_name, files
+
+            except Exception as e:
+                logger.error(f"Error: {e}")
+                continue
+
+        logger.error("Gagal menghasilkan gambar setelah semua retry.")
+        return None, None
+
+
 class AsyncImageGenerator:
     BASE_URL = "https://www.bing.com"
 
@@ -153,3 +242,4 @@ class AsyncImageGenerator:
             
             await asyncio.sleep(interval)
             elapsed_time += interval
+
