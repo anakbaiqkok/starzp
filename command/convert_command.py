@@ -593,18 +593,48 @@ async def consu(dok):
 async def qcolor_cmd(client, message):
     em = Emoji(client)
     await em.get()
+    
     iymek = f"\n•".join(Quotly.colors)
     jadi = f"{em.sukses}Color for quotly\n•"
-    if len(iymek) > 4096:
-        with open("qcolor.txt", "w") as file:
+    
+    # Jika teks terlalu panjang untuk limit Telegram (4096 karakter)
+    if len(jadi + iymek) > 4096:
+        file_path = "qcolor.txt"
+        with open(file_path, "w", encoding="utf-8") as file:
             file.write(iymek)
-        await message.reply_document(
-            "qcolor.txt", caption=f"{em.sukses}Color for quotly"
-        )
-        os.remove("qcolor.txt")
-        return
+        await message.reply_document(file_path, caption=f"{em.sukses}Color for quotly")
+        os.remove(file_path)
     else:
-        return await message.reply(jadi + iymek)
+        await message.reply(jadi + iymek)
+
+
+async def build_message_json(msg, custom_user=None, reply_info=None):
+    """Helper untuk menyusun objek JSON pesan agar tidak redundan."""
+    if custom_user:
+        # Logika untuk Fake Quote (@username)
+        sid = custom_user.id
+        name = custom_user.first_name
+        if custom_user.last_name:
+            name += f" {custom_user.last_name}"
+        title = name
+        emoji_status = str(custom_user.emoji_status.custom_emoji_id) if custom_user.emoji_status else None
+    else:
+        # Logika untuk Real Quote
+        sid, title, name = await Quotly.forward_info(msg)
+        emoji_status = await Quotly.get_emoji(msg)
+
+    return {
+        "entities": Tools.get_msg_entities(msg),
+        "avatar": True,
+        "from": {
+            "id": sid,
+            "title": title,
+            "name": name,
+            "emoji_status": emoji_status,
+        },
+        "text": await Quotly.t_or_c(msg),
+        "replyMessage": reply_info or {},
+    }
 
 
 async def qoutly_cmd(client, message):
@@ -616,173 +646,98 @@ async def qoutly_cmd(client, message):
 
     pros = await animate_proses(message, em.proses)
     reply_msg = message.reply_to_message
-    cmd = message.command[1:]
-    print(f"Cmd: {cmd}")
-
+    cmd = message.command[1:] if message.command else []
+    
     def get_color(index=0):
         return cmd[index] if len(cmd) > index else random.choice(Quotly.colors)
 
     try:
+        messages_to_quote = []
+        color = random.choice(Quotly.colors)
+        reply_message_info = {}
+        custom_user = None
+
+        # Case 1: Teks Perintah Kosong (.q)
         if not cmd:
-            payload = {
-                "type": "quote",
-                "format": "png",
-                "backgroundColor": get_color(),
-                "messages": [],
-            }
-            sid, title, name = await Quotly.forward_info(reply_msg)
-            messages_json = {
-                "entities": Tools.get_msg_entities(reply_msg),
-                "avatar": True,
-                "from": {
-                    "id": sid,
-                    "title": title,
-                    "name": name,
-                    "emoji_status": await Quotly.get_emoji(reply_msg),
-                },
-                "text": await Quotly.t_or_c(reply_msg),
-                "replyMessage": {},
-            }
-            payload["messages"].append(messages_json)
+            color = get_color(0)
+            messages_to_quote.append((reply_msg, None, {}))
+
+        # Case 2: Fake Quote Menggunakan Username (.q @username)
         elif cmd[0].startswith("@"):
             color = get_color(1)
-            include_reply = len(cmd) > 2 and cmd[2] == "-r"
-            payload = {
-                "type": "quote",
-                "format": "png",
-                "backgroundColor": color,
-                "messages": [],
-            }
             username = cmd[0][1:]
-            user = await client.get_users(username)
-            if user.id in SUDO_OWNERS:
+            custom_user = await client.get_users(username)
+            
+            if custom_user.id in SUDO_OWNERS:
                 return await pros.edit(f"{em.gagal}**You can't quote this user**")
 
-            fake_msg = user
-            name = fake_msg.first_name
-            if fake_msg.last_name:
-                name += f" {fake_msg.last_name}"
+            include_reply = len(cmd) > 2 and cmd[2] == "-r"
+            if include_reply and reply_msg.reply_to_message:
+                reply_message_info = Quotly.parse_reply_info(reply_msg.reply_to_message)
 
-            emoji_status = None
-            if fake_msg.emoji_status:
-                emoji_status = str(fake_msg.emoji_status.custom_emoji_id)
+            messages_to_quote.append((reply_msg, custom_user, reply_message_info))
 
-            if include_reply:
-                replied = reply_msg.reply_to_message
-                reply_message = Quotly.parse_reply_info(replied)
-            else:
-                reply_message = {}
-
-            messages_json = {
-                "entities": Tools.get_msg_entities(reply_msg),
-                "avatar": True,
-                "from": {
-                    "id": fake_msg.id,
-                    "title": name,
-                    "name": name,
-                    "emoji_status": emoji_status,
-                },
-                "text": await Quotly.t_or_c(reply_msg),
-                "replyMessage": reply_message,
-            }
-
-            payload["messages"].append(messages_json)
+        # Case 3: Quote dengan Balasan Info (.q -r)
         elif cmd[0].startswith("-r"):
-            replied = reply_msg.reply_to_message
-            reply_message = Quotly.parse_reply_info(replied)
-            payload = {
-                "type": "quote",
-                "format": "png",
-                "backgroundColor": get_color(1),
-                "messages": [],
-            }
-            sid, title, name = await Quotly.forward_info(reply_msg)
-            messages_json = {
-                "entities": Tools.get_msg_entities(reply_msg),
-                "avatar": True,
-                "from": {
-                    "id": sid,
-                    "title": title,
-                    "name": name,
-                    "emoji_status": await Quotly.get_emoji(reply_msg),
-                },
-                "text": await Quotly.t_or_c(reply_msg),
-                "replyMessage": reply_message,
-            }
-            payload["messages"].append(messages_json)
+            color = get_color(1)
+            if reply_msg.reply_to_message:
+                reply_message_info = Quotly.parse_reply_info(reply_msg.reply_to_message)
+            messages_to_quote.append((reply_msg, None, reply_message_info))
+
+        # Case 4: Multi Quote Berdasarkan Jumlah Angka (.q 5)
         elif cmd[0].isdigit():
-            payload = {
-                "type": "quote",
-                "format": "png",
-                "backgroundColor": get_color(1),
-                "messages": [],
-                "scale": 2,
-            }
-            sid, title, name = await Quotly.forward_info(reply_msg)
-            messages_json = {
-                "entities": Tools.get_msg_entities(reply_msg),
-                "avatar": True,
-                "from": {
-                    "id": sid,
-                    "title": title,
-                    "name": name,
-                    "emoji_status": await Quotly.get_emoji(reply_msg),
-                },
-                "text": await Quotly.t_or_c(reply_msg),
-                "replyMessage": {},
-            }
-            payload["messages"].append(messages_json)
+            color = get_color(1)
             count = int(cmd[0])
             if count > 10:
                 return await pros.edit(f"{em.gagal}**Max 10 messages**")
-            async for msg in client.get_chat_history(
-                reply_msg.chat.id, limit=count, offset_id=reply_msg.id
-            ):
-                sid, title, name = await Quotly.forward_info(msg)
-                messages_json = {
-                    "entities": Tools.get_msg_entities(msg),
-                    "avatar": True,
-                    "from": {
-                        "id": sid,
-                        "title": title,
-                        "name": name,
-                        "emoji_status": await Quotly.get_emoji(msg),
-                    },
-                    "text": await Quotly.t_or_c(msg),
-                    "replyMessage": {},
-                }
-                payload["messages"].append(messages_json)
-            payload["messages"].reverse()
+
+            # Ambil riwayat chat mundur dari target pesan yang di-reply
+            # Gunakan list temporary untuk menampung pesan agar urutannya pas kronologis
+            history_msgs = []
+            async for msg in client.get_chat_history(reply_msg.chat.id, limit=count, offset_id=reply_msg.id):
+                history_msgs.append(msg)
+            
+            # Balik urutan riwayat agar pesan terlama diproses duluan
+            history_msgs.reverse()
+            # Masukkan pesan target reply di akhir struktur kuotasi
+            history_msgs.append(reply_msg)
+
+            for msg in history_msgs:
+                messages_to_quote.append((msg, None, {}))
+
+        # Case 5: Kustomisasi Warna Secara Langsung (.q #ffffff atau .q red)
         else:
-            payload = {
-                "type": "quote",
-                "format": "png",
-                "backgroundColor": cmd[0],
-                "messages": [],
-            }
-            sid, title, name = await Quotly.forward_info(reply_msg)
-            messages_json = {
-                "entities": Tools.get_msg_entities(reply_msg),
-                "avatar": True,
-                "from": {
-                    "id": sid,
-                    "title": title,
-                    "name": name,
-                    "emoji_status": await Quotly.get_emoji(reply_msg),
-                },
-                "text": await Quotly.t_or_c(reply_msg),
-            }
-            payload["messages"].append(messages_json)
+            color = cmd[0]
+            messages_to_quote.append((reply_msg, None, {}))
+
+        # Menyusun Payload Final secara Dinamis
+        payload = {
+            "type": "quote",
+            "format": "png",
+            "backgroundColor": color,
+            "messages": [],
+        }
+        
+        if cmd and cmd[0].isdigit():
+            payload["scale"] = 2
+
+        # Bangun isi JSON untuk setiap pesan yang masuk daftar antrean quote
+        for msg, c_user, r_info in messages_to_quote:
+            msg_json = await build_message_json(msg, custom_user=c_user, reply_info=r_info)
+            payload["messages"].append(msg_json)
+
+        # Eksekusi API & Pengiriman Stiker
         hasil = await Quotly.quotly(payload)
+        
         bio_sticker = BytesIO(hasil)
         bio_sticker.name = "biosticker.webp"
+        
         await message.reply_sticker(bio_sticker)
         await pros.delete()
 
     except Exception as e:
         print(f"ERROR: {traceback.format_exc()}")
-        return await pros.edit(f"{em.gagal}{e}")
-
+        return await pros.edit(f"{em.gagal}{str(e)}")
 
 async def textgen_cmd(client, message):
     em = Emoji(client)
