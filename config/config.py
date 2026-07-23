@@ -67,7 +67,7 @@ BOT_ID = int(
     )
 )
 
-API_GEMINI = "AQ.Ab8RN6IhBwyrwKpfxMNsrjY0cFfjWI13BheBxL1EaEB9GSx0-w"
+API_GEMINI = "AIzaSyDX-TM74NZ5wkvoHL_D3nTNRKa60oxAz14"
 
 API_BOTCHAX = os.environ.get(
     "API_BOTCHAX",
