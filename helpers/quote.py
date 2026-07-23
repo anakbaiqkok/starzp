@@ -297,8 +297,8 @@ class Quotly:
             formatted_payload = payload
 
         # Mengirim formatted_payload ke API baru
-        r = await Tools.fetch.post(
-            "https://yuri.ly", json=formatted_payload
+        r = await Tools.fetch.get(
+            "https://yuri.ly", params=formatted_payload
         )
 
         if not r.is_error:
