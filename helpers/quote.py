@@ -281,32 +281,27 @@ class Quotly:
             emoji_status = ""
         return emoji_status
 
-    @staticmethod
-    async def quotly(session: aiohttp.ClientSession, payload: dict) -> bytes:
-        # Gunakan format URL spesifik untuk ekstensi file gambar
-        url = "https://quote.yuri.ly/quote/generate.png"
-        
-        # WAJIB: Masukkan field format & ext ke payload agar API mengenali request POST
-        payload["format"] = "png"
-        payload["ext"] = "png"
+    async def quotly(payload):
+    r = await Tools.fetch.post(
+        "https://quote.yuri.ly/generate",
+        json=payload
+    )
 
-        headers = {
-            "Content-Type": "application/json",
-            "User-Agent": "Mozilla/5.0"
-        }
+    if not r.is_error:
+        data = r.json()
 
-        try:
-            async with session.post(url, json=payload, headers=headers) as resp:
-                # Jika masih error, baca pesan error dari server untuk debugging
-                if resp.status != 200:
-                    text = await resp.text()
-                    raise QuotlyException(f"Yuri API Error {resp.status}: {text}")
+        image = data.get("image")
 
-                # Mengembalikan file binary stiker PNG
-                return await resp.read()
+        if isinstance(image, str):
+            if "," in image:
+                image = image.split(",")[1]
 
-        except aiohttp.ClientError as e:
-            raise QuotlyException(f"Connection error: {e}")
+            return base64.b64decode(image)
+
+        return image
+
+    else:
+        raise QuotlyException(r.json())
 
     @staticmethod
     async def make_carbonara(
