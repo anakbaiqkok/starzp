@@ -6,12 +6,13 @@ import traceback
 from uuid import uuid4
 
 import aiofiles
-import google.generativeai as genai
+import google-genai
 from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from pyrogram.errors import MessageTooLong
 
 from clients import bot
+from google import genai
 from config import API_GEMINI, API_MAELYN
 from database import state
 from helpers import Bing, ButtonUtils, Emoji, Tools, animate_proses, drakor
@@ -19,7 +20,7 @@ from helpers import Bing, ButtonUtils, Emoji, Tools, animate_proses, drakor
 MAX_MEDIA_PER_BATCH = 7
 
 
-MAX_CAPTION_LENGTH = 4000
+MAX_CAPTION_LENGTH = 700
 
 RANDOM_PANTUN = [
     "Percintaan",
@@ -122,28 +123,20 @@ async def alkitab_cmd(client, message):
 
 
 def gen_pantun(prompt):
-    genai.configure(api_key=API_GEMINI)
-    aman = {
-        "HATE": "BLOCK_NONE",
-        "HARASSMENT": "BLOCK_NONE",
-        "SEX": "BLOCK_NONE",
-        "DANGER": "BLOCK_NONE",
-    }
-
-    model = genai.GenerativeModel(
-        "google/gemini-3-pro",
-        system_instruction=(
-            """
-sesuaikan dengan input yang anda terima.
-pastikan output tidak lebih dari 1.
-"""
-        ),
-    )
-
     try:
-        response = model.generate_content(f"{prompt}", safety_settings=aman)
-        return f"{response.text}"
-    except Exception:
+        client = genai.Client(
+            api_key=API_GEMINI
+        )
+
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=f"Buatkan 1 pantun tentang {prompt}. Gunakan bahasa Indonesia."
+        )
+
+        return response.text.strip()
+
+    except Exception as e:
+        print(f"Gemini Error: {e}")
         return None
 
 
@@ -176,17 +169,13 @@ async def gen_kdm(text):
         {"role": "system", "content": role.strip()},
         {"role": "user", "content": text.strip()},
     ]
-    url = "https://api.botcahx.eu.org/api/search/openai-custom-v2"
+    url = "https://api.siputzx.my.id/api/ai/gpt3"
     res = await Tools.fetch.post(url, json=data_json)
-    
     if res.status_code == 200:
         data = res.json()
-        # Menggunakan .get() agar bot tidak crash jika key 'result' mendadak kosong
-        hasil_khodam = data.get("result", "Gagal mendapatkan deskripsi khodam.")
-        return hasil_khodam.replace("\n", "")
+        return data["data"].replace("\n", "")
     else:
-        return f"Error API: {res.text}"
-
+        return f"{res.text}"
 
 
 async def khodam_cmd(client, message):
@@ -443,7 +432,7 @@ async def zodiak_cmd(client, message):
         "pisces",
     ]
     if len(message.command) < 2:
-        return await proses.edit(teks[:MAX_CAPTION_LENGTH])(
+        return await proses.edit(
             f"{em.gagal}**Please give zodiak name\n\n<code>{', '.join([z.capitalize() for z in ZODIAK_LIST])}</code>**"
         )
     try:
@@ -482,7 +471,7 @@ async def zodiak_cmd(client, message):
         f"<b>🌪️ Elemen:</b> {z['elemen_keberuntungan']}\n\n"
         f"<b>❤️ Pasangan Zodiak & Kepribadian:</b>\n<blockquote>{z['pasangan_zodiak']}</blockquote>"
     )
-    
+
     return await proses.edit(f"<blockquote expandable>{teks}</blockquote>")
 
 
