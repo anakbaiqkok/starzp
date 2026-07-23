@@ -123,19 +123,34 @@ async def alkitab_cmd(client, message):
 
 def gen_pantun(prompt):
     try:
+        if not API_GEMINI:
+            return "API Gemini belum dikonfigurasi."
+
         client = genai.Client(
-            api_key=API_GEMINI
+            api_key=API_GEMINI.strip()
         )
 
         response = client.models.generate_content(
             model="gemini-2.0-flash",
-            contents=f"Buatkan 1 pantun tentang {prompt}. Gunakan bahasa Indonesia."
+            contents=[
+                {
+                    "role": "user",
+                    "parts": [
+                        {
+                            "text": f"Buatkan 1 pantun tentang {prompt}. Gunakan bahasa Indonesia."
+                        }
+                    ]
+                }
+            ]
         )
+
+        if not response.text:
+            return None
 
         return response.text.strip()
 
     except Exception as e:
-        print(f"Gemini Error: {e}")
+        print("Gemini Error:", repr(e))
         return None
 
 
