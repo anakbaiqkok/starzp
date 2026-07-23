@@ -282,65 +282,64 @@ class Quotly:
         return emoji_status
 
     @staticmethod
-    async def quotly(payload: dict) -> bytes:
-        # Endpoint POST resmi sesuai dokumentasi LyoSU/quote-api
-        url = "https://yuri.ly"
-        
-        # Susun ulang payload agar sesuai dengan format parameter API terbaru
-        if isinstance(payload, dict):
-            # Pastikan field konfigurasi utama ada
-            if "type" not in payload:
-                payload["type"] = "quote"
-            if "format" not in payload:
-                payload["format"] = "png"
-            
-            # Bersihkan array messages dari parameter usang/ilegal
-            if "messages" in payload:
-                cleaned_messages = []
-                for msg in payload["messages"]:
-                    cleaned_msg = {
-                        "from": {
-                            "id": msg.get("from", {}).get("id", 1),
-                            "name": msg.get("from", {}).get("name", "User")
-                        },
-                        "text": msg.get("text", "")
-                    }
-                    # Salin avatar dan replyMessage jika bot menyediakannya
-                    if "avatar" in msg.get("from", {}):
-                        cleaned_msg["from"]["avatar"] = msg["from"]["avatar"]
-                    if "replyMessage" in msg:
-                        cleaned_msg["replyMessage"] = msg["replyMessage"]
-                        
-                    cleaned_messages.append(cleaned_msg)
-                payload["messages"] = cleaned_messages
+    async def quotly(payload: dict, direct_png: bool = True) -> bytes:
+        """
+        Generate Telegram quote image using Yuri Quote API.
+
+        direct_png=True:
+            https://quote.yuri.ly/quote/generate.png
+            return bytes image
+
+        direct_png=False:
+            https://quote.yuri.ly/quote/generate
+            return decoded base64 image
+        """
+
+        url = (
+            "https://quote.yuri.ly/quote/generate.png"
+            if direct_png
+            else "https://quote.yuri.ly/quote/generate"
+        )
 
         async with aiohttp.ClientSession() as session:
             try:
-                # Mengirim request menggunakan POST dengan JSON bersih
-                async with session.post(url, json=payload) as resp:
-                    if resp.status == 200:
-                        content_type = resp.headers.get("Content-Type", "")
-                        
-                        # Jika respons berupa JSON, lakukan decode base64 dari key 'image'
-                        if "application/json" in content_type:
-                            data = await resp.json()
-                            if 'error' in data:
-                                raise QuotlyException(f"API Error: {data['error']}")
-                            
-                            import base64
-                            # API LyoSU mengembalikan gambar di dalam properti 'image'
-                            img_str = data.get("image", "")
-                            return base64.b64decode(img_str)
-                        
-                        # Jika respons langsung berupa biner gambar mentah
+                async with session.post(
+                    url,
+                    json=payload,
+                    timeout=aiohttp.ClientTimeout(total=60)
+                ) as resp:
+
+                    if resp.status != 200:
+                        error = await resp.text()
+                        raise QuotlyException(
+                            f"Yuri API Error {resp.status}: {error[:200]}"
+                        )
+
+                    # PNG langsung
+                    if direct_png:
                         return await resp.read()
-                    
-                    # Penanganan jika status HTTP bukan 200 OK
-                    err_text = await resp.text()
-                    raise QuotlyException(f"Server Error ({resp.status}): {err_text[:100]}")
-                        
+
+                    # JSON base64
+                    data = await resp.json()
+
+                    if "error" in data:
+                        raise QuotlyException(
+                            data["error"]
+                        )
+
+                    image = data.get("image")
+
+                    if not image:
+                        raise QuotlyException(
+                            "Image tidak ditemukan pada response"
+                        )
+
+                    return base64.b64decode(image)
+
             except aiohttp.ClientError as e:
-                raise QuotlyException(f"Gagal terhubung ke API Yuri: {str(e)}")
+                raise QuotlyException(
+                    f"Koneksi Yuri gagal: {e}"
+                )
 
     @staticmethod
     async def make_carbonara(
