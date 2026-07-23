@@ -6,7 +6,8 @@ import traceback
 from uuid import uuid4
 
 import aiofiles
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from pyrogram.errors import MessageTooLong
@@ -122,28 +123,45 @@ async def alkitab_cmd(client, message):
 
 
 def gen_pantun(prompt):
-    genai.configure(api_key=API_GEMINI)
-    aman = {
-        "HATE": "BLOCK_NONE",
-        "HARASSMENT": "BLOCK_NONE",
-        "SEX": "BLOCK_NONE",
-        "DANGER": "BLOCK_NONE",
-    }
-
-    model = genai.GenerativeModel(
-        "models/gemini-1.5-flash",
-        system_instruction=(
-            """
-sesuaikan dengan input yang anda terima.
-pastikan output tidak lebih dari 1.
-"""
-        ),
+    client = genai.Client(
+        api_key=API_GEMINI
     )
 
     try:
-        response = model.generate_content(f"{prompt}", safety_settings=aman)
-        return f"{response.text}"
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                system_instruction="""
+Sesuaikan dengan input yang anda terima.
+Pastikan output tidak lebih dari 1 pantun.
+""",
+                temperature=0.8,
+                safety_settings=[
+                    types.SafetySetting(
+                        category="HARM_CATEGORY_HATE_SPEECH",
+                        threshold="BLOCK_NONE",
+                    ),
+                    types.SafetySetting(
+                        category="HARM_CATEGORY_HARASSMENT",
+                        threshold="BLOCK_NONE",
+                    ),
+                    types.SafetySetting(
+                        category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                        threshold="BLOCK_NONE",
+                    ),
+                    types.SafetySetting(
+                        category="HARM_CATEGORY_DANGEROUS_CONTENT",
+                        threshold="BLOCK_NONE",
+                    ),
+                ],
+            ),
+        )
+
+        return response.text
+
     except Exception:
+        traceback.print_exc()
         return None
 
 
