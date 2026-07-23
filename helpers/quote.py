@@ -282,7 +282,7 @@ class Quotly:
         return emoji_status
 
     @staticmethod
-    async def quotly(session, payload):
+    async def quotly(payload):
         try:
             async with session.post(
                 "https://quote.yuri.ly/generate",
