@@ -625,17 +625,17 @@ async def build_message_json(msg, custom_user=None, reply_info=None):
         emoji_status = await Quotly.get_emoji(msg)
 
     return {
-        "entities": Tools.get_msg_entities(msg),
-        "avatar": True,
-        "from": {
-            "id": sid,
-            "title": title,
-            "name": name,
-            "emoji_status": emoji_status,
-        },
-        "text": await Quotly.t_or_c(msg),
-        "replyMessage": reply_info or {},
-    }
+    "from": {
+        "id": sid,
+        "first_name": name,
+        "last_name": "",
+        "username": "",
+    },
+    "text": await Quotly.t_or_c(msg),
+    "entities": Tools.get_msg_entities(msg),
+    "avatar": True,
+    "replyMessage": reply_info or {},
+}
 
 
 async def qoutly_cmd(client, message):
@@ -708,11 +708,13 @@ async def qoutly_cmd(client, message):
 
         # Menyusun Payload Final secara Dinamis
         payload = {
-            "type": "quote",
-            "format": "png",
-            "backgroundColor": color,
-            "messages": [],
-        }
+    "backgroundColor": color,
+    "width": 512,
+    "height": 768,
+    "scale": 2,
+    "emojiBrand": "apple",
+    "messages": [],
+}
         
         if cmd and cmd[0].isdigit():
             payload["scale"] = 2
