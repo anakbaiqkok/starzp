@@ -283,12 +283,12 @@ class Quotly:
 
     @staticmethod
     async def quotly(session: aiohttp.ClientSession, payload: dict) -> bytes:
-        # Perubahan 1: Ubah endpoint URL yang benar sesuai dokumentasi API terbaru
-        url = "https://yuri.ly" 
+        # Gunakan format URL spesifik untuk ekstensi file gambar
+        url = "https://quote.yuri.ly/quote/generate.png"
         
-        # Perubahan 2: Pastikan parameter 'ext' diset agar respons berbentuk bytes (Buffer)
-        if "ext" not in payload:
-            payload["ext"] = "png"
+        # WAJIB: Masukkan field format & ext ke payload agar API mengenali request POST
+        payload["format"] = "png"
+        payload["ext"] = "png"
 
         headers = {
             "Content-Type": "application/json",
@@ -297,10 +297,12 @@ class Quotly:
 
         try:
             async with session.post(url, json=payload, headers=headers) as resp:
+                # Jika masih error, baca pesan error dari server untuk debugging
                 if resp.status != 200:
                     text = await resp.text()
                     raise QuotlyException(f"Yuri API Error {resp.status}: {text}")
 
+                # Mengembalikan file binary stiker PNG
                 return await resp.read()
 
         except aiohttp.ClientError as e:
