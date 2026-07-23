@@ -6,13 +6,12 @@ import traceback
 from uuid import uuid4
 
 import aiofiles
-import google-genai
+from google import genai
 from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from pyrogram.errors import MessageTooLong
 
 from clients import bot
-from google import genai
 from config import API_GEMINI, API_MAELYN
 from database import state
 from helpers import Bing, ButtonUtils, Emoji, Tools, animate_proses, drakor
