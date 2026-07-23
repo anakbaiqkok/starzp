@@ -726,7 +726,8 @@ async def qoutly_cmd(client, message):
 
         # Eksekusi API & Pengiriman Stiker (Didefinisikan dengan benar)
         async with aiohttp.ClientSession() as session:
-            hasil = await Quotly.quotly(session, payload)
+            quotly_instance = Quotly() 
+hasil = await quotly_instance.quotly(session, payload)
         
         if not hasil:
             return await pros.edit(f"{em.gagal}**Failed to generate quote from API**")
