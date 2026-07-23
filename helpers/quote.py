@@ -3,6 +3,7 @@ from io import BytesIO
 
 import aiofiles
 import aiohttp
+import aiohttp
 import base64
 
 from config import BOT_NAME
@@ -280,50 +281,30 @@ class Quotly:
             emoji_status = ""
         return emoji_status
 
-    async def quotly(payload):
-        # Memastikan payload dibungkus dengan method 'generate' yang diminta server yuri.ly
-        if isinstance(payload, dict) and "method" not in payload:
-            if "messages" in payload:
-                formatted_payload = {
-                    "method": "generate",
-                    "messages": payload["messages"]
-                }
-            else:
-                formatted_payload = {
-                    "method": "generate",
-                    "messages": [payload]
-                }
-        else:
-            formatted_payload = payload
-
-        # Mengirim formatted_payload ke API baru
-        r = await Tools.fetch.get(
-            "https://yuri.ly", params=formatted_payload
-        )
-
-        if not r.is_error:
-                try:
-    res_json = r.json()
-except Exception as e:
-    # Mengambil text asli dari API untuk di-debug ke log
-    print(f"[DEBUG QUOTLY] Respons API Bukan JSON. Isi Teks: {r.text[:500]}")
-    raise QuotlyException(f"API Quotly (yuri.ly) sedang error atau mengembalikan format non-JSON. Status Code: {r.status_code}")
-                
-                # Mendukung respons terbungkus 'result' (standar Quotly) atau langsung key 'image'
-                if "result" in res_json and "image" in res_json["result"]:
-                    return base64.b64decode(res_json["result"]["image"])
-                elif "image" in res_json:
-                    return base64.b64decode(res_json["image"])
-                elif "error" in res_json:
-                    raise QuotlyException(f"API Error: {res_json['error']}")
-                else:
-                    raise QuotlyException("Key 'image' tidak ditemukan dalam respons API.")
-            except Exception as e:
-                if isinstance(e, QuotlyException):
-                    raise e
-                raise QuotlyException(f"Gagal memproses JSON/Base64 dari API: {str(e)}")
-        else:
-            raise QuotlyException(f"Server Error ({r.status_code}): {r.text[:100]}")
+    @staticmethod
+    async def quotly(payload: dict) -> bytes:
+        # Gunakan sub-endpoint .png resmi untuk mendapatkan biner gambar langsung
+        url = "https://yuri.ly"
+        
+        async with aiohttp.ClientSession() as session:
+            try:
+                # Mengirim request menggunakan POST secara eksplisit dengan json body
+                async with session.post(url, json=payload) as resp:
+                    if resp.status == 200:
+                        # API .png langsung mengembalikan data biner gambar mentah
+                        return await resp.read()
+                    
+                    # Penanganan jika terjadi eror dari sisi server API
+                    content_type = resp.headers.get("Content-Type", "")
+                    if "application/json" in content_type:
+                        err_json = await resp.json()
+                        raise QuotlyException(f"API Error: {err_json.get('error', err_json)}")
+                    else:
+                        err_text = await resp.text()
+                        raise QuotlyException(f"Server Error ({resp.status}): {err_text[:100]}")
+                        
+            except aiohttp.ClientError as e:
+                raise QuotlyException(f"Gagal terhubung ke API Yuri: {str(e)}")
 
 
     @staticmethod
