@@ -283,52 +283,64 @@ class Quotly:
 
     @staticmethod
     async def quotly(payload: dict) -> bytes:
-        # Gunakan sub-endpoint format biner resmi agar server langsung membalas gambar
-        url = "https://quote.yuri.ly/quote/generate.png"
+        # Endpoint POST resmi sesuai dokumentasi LyoSU/quote-api
+        url = "https://yuri.ly"
         
-        # Validasi struktur minimal payload untuk mencegah 'method not found' dari API
-        if isinstance(payload, dict) and "messages" in payload:
-            # Bersihkan payload dan ambil hanya field utama yang diwajibkan oleh LyoSU/quote-api
-            cleaned_messages = []
-            for msg in payload["messages"]:
-                cleaned_msg = {
-                    "from": {
-                        "id": msg.get("from", {}).get("id", 1),
-                        "name": msg.get("from", {}).get("name", "User")
-                    },
-                    "text": msg.get("text", "")
-                }
-                # Jika bot Anda mengirimkan avatar/foto profil, ikut sertakan di bawah
-                if "avatar" in msg.get("from", {}):
-                    cleaned_msg["from"]["avatar"] = msg["from"]["avatar"]
-                if "replyMessage" in msg:
-                    cleaned_msg["replyMessage"] = msg["replyMessage"]
-                    
-                cleaned_messages.append(cleaned_msg)
+        # Susun ulang payload agar sesuai dengan format parameter API terbaru
+        if isinstance(payload, dict):
+            # Pastikan field konfigurasi utama ada
+            if "type" not in payload:
+                payload["type"] = "quote"
+            if "format" not in payload:
+                payload["format"] = "png"
             
-            # Susun ulang payload murni yang dijamin lolos validasi server 400
-            payload = {"messages": cleaned_messages}
+            # Bersihkan array messages dari parameter usang/ilegal
+            if "messages" in payload:
+                cleaned_messages = []
+                for msg in payload["messages"]:
+                    cleaned_msg = {
+                        "from": {
+                            "id": msg.get("from", {}).get("id", 1),
+                            "name": msg.get("from", {}).get("name", "User")
+                        },
+                        "text": msg.get("text", "")
+                    }
+                    # Salin avatar dan replyMessage jika bot menyediakannya
+                    if "avatar" in msg.get("from", {}):
+                        cleaned_msg["from"]["avatar"] = msg["from"]["avatar"]
+                    if "replyMessage" in msg:
+                        cleaned_msg["replyMessage"] = msg["replyMessage"]
+                        
+                    cleaned_messages.append(cleaned_msg)
+                payload["messages"] = cleaned_messages
 
         async with aiohttp.ClientSession() as session:
             try:
-                # Mengirim request menggunakan POST secara eksplisit dengan json body bersih
+                # Mengirim request menggunakan POST dengan JSON bersih
                 async with session.post(url, json=payload) as resp:
                     if resp.status == 200:
-                        # Langsung kembalikan biner mentah gambar stiker tanpa decode base64
+                        content_type = resp.headers.get("Content-Type", "")
+                        
+                        # Jika respons berupa JSON, lakukan decode base64 dari key 'image'
+                        if "application/json" in content_type:
+                            data = await resp.json()
+                            if 'error' in data:
+                                raise QuotlyException(f"API Error: {data['error']}")
+                            
+                            import base64
+                            # API LyoSU mengembalikan gambar di dalam properti 'image'
+                            img_str = data.get("image", "")
+                            return base64.b64decode(img_str)
+                        
+                        # Jika respons langsung berupa biner gambar mentah
                         return await resp.read()
                     
-                    # Penanganan jika terjadi eror dari sisi server API
-                    content_type = resp.headers.get("Content-Type", "")
-                    if "application/json" in content_type:
-                        err_json = await resp.json()
-                        raise QuotlyException(f"API Error: {err_json.get('error', err_json)}")
-                    else:
-                        err_text = await resp.text()
-                        raise QuotlyException(f"Server Error ({resp.status}): {err_text[:100]}")
+                    # Penanganan jika status HTTP bukan 200 OK
+                    err_text = await resp.text()
+                    raise QuotlyException(f"Server Error ({resp.status}): {err_text[:100]}")
                         
             except aiohttp.ClientError as e:
                 raise QuotlyException(f"Gagal terhubung ke API Yuri: {str(e)}")
-
 
     @staticmethod
     async def make_carbonara(
