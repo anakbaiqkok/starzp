@@ -11,6 +11,9 @@ from helpers import (Emoji, Spotify, Tools, YoutubeSearch, animate_proses,
                      gen_qthumb, stream, telegram)
 from logs import logger
 
+cookie_path = "/root/starbot/storage/cookies/youtube/"
+if not os.path.exists(cookie_path):
+    os.makedirs(cookie_path, exist_ok=True)
 
 async def skip_songs(client, chat_id):
     emo = Emoji(client)
