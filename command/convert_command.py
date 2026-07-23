@@ -726,12 +726,14 @@ async def qoutly_cmd(client, message):
 
         # Eksekusi API & Pengiriman Stiker (Didefinisikan dengan benar)
         async with aiohttp.ClientSession() as session:
-            try:
-    quotly_instance = Quotly()
-    hasil = await quotly_instance.quotly(session, payload)
-except Exception as e:
-    # Kode untuk menangani error jika modul gagal merespons
-    print(f"Terjadi error: {e}")
+                # Baris 728: Kode sebelum try
+    try:
+        # Baris 730: WAJIB menjorok ke dalam (4 spasi dari try)
+        hasil = await Quotly.quotly(session, payload) 
+    except Exception as e:
+        # Menangani error jika fungsi gagal
+        print(f"Error pada Quotly: {e}")
+
         
         if not hasil:
             return await pros.edit(f"{em.gagal}**Failed to generate quote from API**")
