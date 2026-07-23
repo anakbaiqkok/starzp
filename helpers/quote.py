@@ -302,8 +302,12 @@ class Quotly:
         )
 
         if not r.is_error:
-            try:
-                res_json = r.json()
+                try:
+    res_json = r.json()
+except Exception as e:
+    # Mengambil text asli dari API untuk di-debug ke log
+    print(f"[DEBUG QUOTLY] Respons API Bukan JSON. Isi Teks: {r.text[:500]}")
+    raise QuotlyException(f"API Quotly (yuri.ly) sedang error atau mengembalikan format non-JSON. Status Code: {r.status_code}")
                 
                 # Mendukung respons terbungkus 'result' (standar Quotly) atau langsung key 'image'
                 if "result" in res_json and "image" in res_json["result"]:
