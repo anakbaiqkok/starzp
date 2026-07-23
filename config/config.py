@@ -67,7 +67,12 @@ BOT_ID = int(
     )
 )
 
-API_GEMINI = "AIzaSyDX-TM74NZ5wkvoHL_D3nTNRKa60oxAz14"
+import os
+
+API_GEMINI = os.environ.get(
+    "API_GEMINI",
+    None,
+)
 
 API_BOTCHAX = os.environ.get(
     "API_BOTCHAX",
