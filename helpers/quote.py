@@ -281,26 +281,27 @@ class Quotly:
             emoji_status = ""
         return emoji_status
 
+    @staticmethod
     async def quotly(payload):
-    r = await Tools.fetch.post(
-        "https://quote.yuri.ly/generate",
-        json=payload
-    )
+        r = await Tools.fetch.post(
+            "https://quote.yuri.ly/generate",
+            json=payload
+        )
 
-    if not r.is_error:
-        data = r.json()
+        if not r.is_error:
+            data = r.json()
+            image = data.get("image")
 
-        image = data.get("image")
+            if isinstance(image, str):
+                if "," in image:
+                    image = image.split(",")[1]
 
-        if isinstance(image, str):
-            if "," in image:
-                image = image.split(",")[1]
+                import base64
+                return base64.b64decode(image)
 
-            return base64.b64decode(image)
+            return image
 
-        return image
-
-    raise QuotlyException(r.json())
+        raise QuotlyException(r.json())
 
     @staticmethod
     async def make_carbonara(
