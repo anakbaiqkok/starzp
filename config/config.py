@@ -84,6 +84,11 @@ API_BLACKBOX = os.environ.get(
     None,
 )
 
+API_MAELYN = os.environ.get(
+    "API_MAELYN",
+    None,
+)
+
 LOLHUMAN_KEY = os.environ.get(
     "LOLHUMAN_KEY",
     None,
