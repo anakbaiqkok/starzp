@@ -283,10 +283,11 @@ class Quotly:
 
     @staticmethod
     async def quotly(payload: dict) -> bytes:
-        # Gunakan sub-endpoint .png resmi untuk mendapatkan biner gambar langsung
-        url = "https://yuri.ly"
-        
-        async with aiohttp.ClientSession() as session:
+    # Menggunakan endpoint sub-domain resmi untuk generate gambar biner (.png)
+    url = "https://quote.yuri.ly/quote/generate.png"
+    
+    async with aiohttp.ClientSession() as session:
+
             try:
                 # Mengirim request menggunakan POST secara eksplisit dengan json body
                 async with session.post(url, json=payload) as resp:
