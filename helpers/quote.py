@@ -283,15 +283,19 @@ class Quotly:
 
     @staticmethod
     async def quotly(payload: dict) -> bytes:
-        # Menggunakan endpoint sub-domain resmi untuk generate gambar biner (.png)
+        # Gunakan endpoint POST resmi untuk generate quote api
         url = "https://yuri.ly"
+        
+        # Pastikan payload meminta output berupa Buffer biner gambar langsung
+        if isinstance(payload, dict):
+            payload["ext"] = "png"
         
         async with aiohttp.ClientSession() as session:
             try:
                 # Mengirim request menggunakan POST secara eksplisit dengan json body
                 async with session.post(url, json=payload) as resp:
                     if resp.status == 200:
-                        # API .png langsung mengembalikan data biner gambar mentah
+                        # API langsung mengembalikan data biner gambar mentah jika ext ditentukan
                         return await resp.read()
                     
                     # Penanganan jika terjadi eror dari sisi server API
@@ -305,6 +309,7 @@ class Quotly:
                         
             except aiohttp.ClientError as e:
                 raise QuotlyException(f"Gagal terhubung ke API Yuri: {str(e)}")
+
 
 
 
