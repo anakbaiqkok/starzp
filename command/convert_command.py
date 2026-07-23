@@ -727,7 +727,8 @@ async def qoutly_cmd(client, message):
             payload["messages"].append(msg_json)
 
         # Eksekusi API & Pengiriman Stiker
-        hasil = await Quotly.quotly(session, payload)
+        async with aiohttp.ClientSession() as session:
+            hasil = await Quotly.quotly(session, payload)
         
         bio_sticker = BytesIO(hasil)
         bio_sticker.name = "biosticker.webp"
