@@ -60,17 +60,14 @@ pykeyboard
 pyyaml==6.0.1
 search_engine_parser
 pyrotgfork==2.2.23
-##py-tgcalls~=2.2.8
 speedtest-cli
 python-telegram-bot
 telethon
-yt-dlp[default]>=2025.12.8
+yt-dlp
 youtube-search
 youtube-search-python
-yt-dlp pytgcalls
 gpytranslate
-###google-genai
 git+https://github.com/googleapis/python-genai.git@main
-git+https://github.com/zpkemem-code/callgram.git@master
+git+https://github.com/jonesroot/callgram.git@master
 git+https://github.com/FerlyKurniawan/pyrofork
 git+https://github.com/FerlyKurniawan/hydrogram@dev
