@@ -68,12 +68,19 @@ class StreamingTools:
 
     async def run_stream(self, link, media_type):
         url = self.sanitize_url(link)
-        ydl_params = f"--cookies {cookies()} -f {url} --extractor-args 'youtubetab:skip=authcheck'"
+        
+        # Mengambil file cookie acak dari fungsi cookies() Anda
+        current_cookie = cookies() 
+
+        # Menghapus '--cookies' dari string ytdlp_parameters karena sering gagal di-parse oleh pytgcalls
+        ydl_params = "--extractor-args \"youtubetab:skip=authcheck\""
 
         stream_kwargs = {
             "media_path": url,
             "audio_parameters": AudioQuality.MEDIUM,
             "ytdlp_parameters": ydl_params,
+            # Tambahkan baris di bawah ini jika pytgcalls versi Anda mendukung inject direct parameter:
+            # "cookiefile": current_cookie, 
         }
 
         if media_type == "Video":
@@ -82,6 +89,7 @@ class StreamingTools:
             stream_kwargs["video_flags"] = MediaStream.Flags.IGNORE
 
         return MediaStream(**stream_kwargs)
+
 
     def get_active_call(self, chat_id, user_id):
         return self.active_calls.get((chat_id, user_id))
