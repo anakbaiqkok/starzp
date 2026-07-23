@@ -67,6 +67,7 @@ telethon
 yt-dlp[default]>=2025.12.8
 youtube-search
 youtube-search-python
+yt-dlp pytgcalls
 gpytranslate
 ###google-genai
 git+https://github.com/googleapis/python-genai.git@main
