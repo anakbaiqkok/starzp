@@ -283,17 +283,41 @@ class Quotly:
 
     @staticmethod
     async def quotly(payload: dict) -> bytes:
-        # Endpoint format-spesifik langsung mengembalikan data biner PNG
+        # Gunakan sub-endpoint format biner resmi agar server langsung membalas gambar
         url = "https://quote.yuri.ly/quote/generate.png"
         
+        # Validasi struktur minimal payload untuk mencegah 'method not found' dari API
+        if isinstance(payload, dict) and "messages" in payload:
+            # Bersihkan payload dan ambil hanya field utama yang diwajibkan oleh LyoSU/quote-api
+            cleaned_messages = []
+            for msg in payload["messages"]:
+                cleaned_msg = {
+                    "from": {
+                        "id": msg.get("from", {}).get("id", 1),
+                        "name": msg.get("from", {}).get("name", "User")
+                    },
+                    "text": msg.get("text", "")
+                }
+                # Jika bot Anda mengirimkan avatar/foto profil, ikut sertakan di bawah
+                if "avatar" in msg.get("from", {}):
+                    cleaned_msg["from"]["avatar"] = msg["from"]["avatar"]
+                if "replyMessage" in msg:
+                    cleaned_msg["replyMessage"] = msg["replyMessage"]
+                    
+                cleaned_messages.append(cleaned_msg)
+            
+            # Susun ulang payload murni yang dijamin lolos validasi server 400
+            payload = {"messages": cleaned_messages}
+
         async with aiohttp.ClientSession() as session:
             try:
+                # Mengirim request menggunakan POST secara eksplisit dengan json body bersih
                 async with session.post(url, json=payload) as resp:
                     if resp.status == 200:
-                        # Langsung kembalikan biner mentah tanpa decode base64
+                        # Langsung kembalikan biner mentah gambar stiker tanpa decode base64
                         return await resp.read()
                     
-                    # Penanganan jika terjadi eror
+                    # Penanganan jika terjadi eror dari sisi server API
                     content_type = resp.headers.get("Content-Type", "")
                     if "application/json" in content_type:
                         err_json = await resp.json()
@@ -304,6 +328,7 @@ class Quotly:
                         
             except aiohttp.ClientError as e:
                 raise QuotlyException(f"Gagal terhubung ke API Yuri: {str(e)}")
+
 
     @staticmethod
     async def make_carbonara(
