@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 # Update dan instal paket yang diperlukan
 RUN apt-get update -y && apt-get upgrade -y && \
