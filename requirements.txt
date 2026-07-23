@@ -69,7 +69,7 @@ youtube-search
 youtube-search-python
 gpytranslate
 ###google-genai
-git+https://github.com/google-gemini/generative-ai-python.git@main
+git+https://github.com/googleapis/python-genai.git@main
 git+https://github.com/zpkemem-code/callgram.git@master
 git+https://github.com/FerlyKurniawan/pyrofork
 git+https://github.com/FerlyKurniawan/hydrogram@dev
