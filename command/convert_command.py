@@ -726,10 +726,13 @@ async def qoutly_cmd(client, message):
 
         # Eksekusi API & Pengiriman Stiker (Didefinisikan dengan benar)
         async with aiohttp.ClientSession() as session:
-                # Baris 728: Kode sebelum try
-    try:
-        # Baris 730: WAJIB menjorok ke dalam (4 spasi dari try)
-        hasil = await Quotly.quotly(session, payload) 
+async with session.post(url, json=payload) as response:
+        # Baris 730: WAJIB beri jarak 4 SPASI lebih menjorok ke kanan dibanding baris 728
+        hasil = await response.json()
+        
+    # Baris 732: Jika ada kode lanjutan di luar blok 'with', sejajarkan dengan 'async with'
+    return hasil
+
     except Exception as e:
         # Menangani error jika fungsi gagal
         print(f"Error pada Quotly: {e}")
