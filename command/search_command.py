@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import aiofiles
 from google import genai
+from google.genai import types
 from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from pyrogram.errors import MessageTooLong
@@ -121,20 +122,46 @@ async def alkitab_cmd(client, message):
         return await proses.edit(f"{em.gagal}**Terjadi error:** `{e}`")
 
 
-client = genai.Client(api_key=API_GEMINI)
-
 def gen_pantun(prompt):
     try:
+        client = genai.Client(
+            api_key=API_GEMINI
+        )
+
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt,
-            config={
-                "system_instruction": "Buat hanya 1 pantun sesuai input."
-            }
+            config=types.GenerateContentConfig(
+                system_instruction=(
+                    "Sesuaikan dengan input yang diterima. "
+                    "Pastikan output tidak lebih dari 1 pantun."
+                ),
+                temperature=0.9,
+                safety_settings=[
+                    types.SafetySetting(
+                        category="HARM_CATEGORY_HATE_SPEECH",
+                        threshold="BLOCK_NONE",
+                    ),
+                    types.SafetySetting(
+                        category="HARM_CATEGORY_HARASSMENT",
+                        threshold="BLOCK_NONE",
+                    ),
+                    types.SafetySetting(
+                        category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                        threshold="BLOCK_NONE",
+                    ),
+                    types.SafetySetting(
+                        category="HARM_CATEGORY_DANGEROUS_CONTENT",
+                        threshold="BLOCK_NONE",
+                    ),
+                ],
+            ),
         )
+
         return response.text
+
     except Exception as e:
-        print(e)
+        print(f"Gemini Error: {e}")
         return None
 
 
