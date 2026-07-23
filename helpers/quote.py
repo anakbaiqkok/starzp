@@ -281,16 +281,34 @@ class Quotly:
         return emoji_status
 
     async def quotly(payload):
-        # Mengubah endpoint ke API baru yang Anda berikan
+        # Memastikan payload dibungkus dengan method 'generate' yang diminta server yuri.ly
+        if isinstance(payload, dict) and "method" not in payload:
+            if "messages" in payload:
+                formatted_payload = {
+                    "method": "generate",
+                    "messages": payload["messages"]
+                }
+            else:
+                formatted_payload = {
+                    "method": "generate",
+                    "messages": [payload]
+                }
+        else:
+            formatted_payload = payload
+
+        # Mengirim formatted_payload ke API baru
         r = await Tools.fetch.post(
-            "https://quote.yuri.ly/quote/generate", json=payload
+            "https://yuri.ly", json=formatted_payload
         )
 
         if not r.is_error:
             try:
                 res_json = r.json()
-                # API baru mengembalikan JSON berisi string base64 pada key 'image'
-                if "image" in res_json:
+                
+                # Mendukung respons terbungkus 'result' (standar Quotly) atau langsung key 'image'
+                if "result" in res_json and "image" in res_json["result"]:
+                    return base64.b64decode(res_json["result"]["image"])
+                elif "image" in res_json:
                     return base64.b64decode(res_json["image"])
                 elif "error" in res_json:
                     raise QuotlyException(f"API Error: {res_json['error']}")
@@ -302,6 +320,7 @@ class Quotly:
                 raise QuotlyException(f"Gagal memproses JSON/Base64 dari API: {str(e)}")
         else:
             raise QuotlyException(f"Server Error ({r.status_code}): {r.text[:100]}")
+
 
     @staticmethod
     async def make_carbonara(
