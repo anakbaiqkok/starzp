@@ -3,6 +3,7 @@ from io import BytesIO
 
 import aiofiles
 import aiohttp
+import base64
 
 from config import BOT_NAME
 
@@ -280,14 +281,27 @@ class Quotly:
         return emoji_status
 
     async def quotly(payload):
+        # Mengubah endpoint ke API baru yang Anda berikan
         r = await Tools.fetch.post(
             "https://quote.yuri.ly/quote/generate", json=payload
         )
 
         if not r.is_error:
-            return r.read()
+            try:
+                res_json = r.json()
+                # API baru mengembalikan JSON berisi string base64 pada key 'image'
+                if "image" in res_json:
+                    return base64.b64decode(res_json["image"])
+                elif "error" in res_json:
+                    raise QuotlyException(f"API Error: {res_json['error']}")
+                else:
+                    raise QuotlyException("Key 'image' tidak ditemukan dalam respons API.")
+            except Exception as e:
+                if isinstance(e, QuotlyException):
+                    raise e
+                raise QuotlyException(f"Gagal memproses JSON/Base64 dari API: {str(e)}")
         else:
-            raise QuotlyException(r.json())
+            raise QuotlyException(f"Server Error ({r.status_code}): {r.text[:100]}")
 
     @staticmethod
     async def make_carbonara(
