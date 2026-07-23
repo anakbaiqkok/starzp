@@ -639,117 +639,118 @@ async def build_message_json(msg, custom_user=None, reply_info=None):
 
 
 async def qoutly_cmd(client, message):
-    em = Emoji(client)
-    await em.get()
+em = Emoji(client)
+await em.get()
 
-    if not message.reply_to_message:
-        return await message.reply(f"{em.gagal}**Please reply to a message!**")
+if not message.reply_to_message:  
+    return await message.reply(f"{em.gagal}**Please reply to a message!**")  
 
-    pros = await animate_proses(message, em.proses)
-    reply_msg = message.reply_to_message
-    cmd = message.command[1:] if message.command else []
-    
-    def get_color(index=0):
-        return cmd[index] if len(cmd) > index else random.choice(Quotly.colors)
+pros = await animate_proses(message, em.proses)  
+reply_msg = message.reply_to_message  
+cmd = message.command[1:] if message.command else []  
+  
+def get_color(index=0):  
+    return cmd[index] if len(cmd) > index else random.choice(Quotly.colors)  
 
-    try:
-        messages_to_quote = []
-        color = random.choice(Quotly.colors)
-        reply_message_info = {}
+try:  
+    messages_to_quote = []  
+    color = random.choice(Quotly.colors)  
+    reply_message_info = {}  
 
-        # Case 1: Teks Perintah Kosong (.q)
-        if not cmd:
-            color = get_color(0)
-            messages_to_quote.append((reply_msg, None, {}))
+    # Case 1: Teks Perintah Kosong (.q)  
+    if not cmd:  
+        color = get_color(0)  
+        messages_to_quote.append((reply_msg, None, {}))  
 
-        # Case 2: Fake Quote Menggunakan Username (.q @username)
-        elif cmd[0].startswith("@"):
-            color = get_color(1)
-            username = cmd[0][1:]
-            custom_user = await client.get_users(username)
-            
-            if custom_user.id in SUDO_OWNERS:
-                return await pros.edit(f"{em.gagal}**You can't quote this user**")
+    # Case 2: Fake Quote Menggunakan Username (.q @username)  
+    elif cmd[0].startswith("@"):  
+        color = get_color(1)  
+        username = cmd[0][1:]  
+        custom_user = await client.get_users(username)  
+          
+        if custom_user.id in SUDO_OWNERS:  
+            return await pros.edit(f"{em.gagal}**You can't quote this user**")  
 
-            include_reply = len(cmd) > 2 and cmd[2] == "-r"
-            if include_reply and reply_msg.reply_to_message:
-                reply_message_info = Quotly.parse_reply_info(reply_msg.reply_to_message)
+        include_reply = len(cmd) > 2 and cmd[2] == "-r"  
+        if include_reply and reply_msg.reply_to_message:  
+            reply_message_info = Quotly.parse_reply_info(reply_msg.reply_to_message)  
 
-            messages_to_quote.append((reply_msg, custom_user, reply_message_info))
+        messages_to_quote.append((reply_msg, custom_user, reply_message_info))  
 
-        # Case 3: Quote dengan Balasan Info (.q -r)
-        elif cmd[0].startswith("-r"):
-            color = get_color(1)
-            if reply_msg.reply_to_message:
-                reply_message_info = Quotly.parse_reply_info(reply_msg.reply_to_message)
-            messages_to_quote.append((reply_msg, None, reply_message_info))
+    # Case 3: Quote dengan Balasan Info (.q -r)  
+    elif cmd[0].startswith("-r"):  
+        color = get_color(1)  
+        if reply_msg.reply_to_message:  
+            reply_message_info = Quotly.parse_reply_info(reply_msg.reply_to_message)  
+        messages_to_quote.append((reply_msg, None, reply_message_info))  
 
-        # Case 4: Multi Quote Berdasarkan Jumlah Angka (.q 5)
-        elif cmd[0].isdigit():
-            color = get_color(1)
-            count = int(cmd[0])
-            if count > 10:
-                return await pros.edit(f"{em.gagal}**Max 10 messages**")
+    # Case 4: Multi Quote Berdasarkan Jumlah Angka (.q 5)  
+    elif cmd[0].isdigit():  
+        color = get_color(1)  
+        count = int(cmd[0])  
+        if count > 10:  
+            return await pros.edit(f"{em.gagal}**Max 10 messages**")  
 
-            history_msgs = []
-            async for msg in client.get_chat_history(reply_msg.chat.id, limit=count, offset_id=reply_msg.id):
-                history_msgs.append(msg)
-            
-            history_msgs.reverse()
-            history_msgs.append(reply_msg)
+        history_msgs = []  
+        async for msg in client.get_chat_history(reply_msg.chat.id, limit=count, offset_id=reply_msg.id):  
+            history_msgs.append(msg)  
+          
+        history_msgs.reverse()  
+        history_msgs.append(reply_msg)  
 
-            for msg in history_msgs:
-                messages_to_quote.append((msg, None, {}))
+        for msg in history_msgs:  
+            messages_to_quote.append((msg, None, {}))  
 
-        # Case 5: Kustomisasi Warna Secara Langsung (.q #ffffff atau .q red)
-        else:
-            color = cmd[0]
-            messages_to_quote.append((reply_msg, None, {}))
+    # Case 5: Kustomisasi Warna Secara Langsung (.q #ffffff atau .q red)  
+    else:  
+        color = cmd[0]  
+        messages_to_quote.append((reply_msg, None, {}))  
 
-        # Menyusun Payload Final secara Dinamis
-        payload = {
-    "backgroundColor": color,
-    "width": 512,
-    "height": 768,
-    "scale": 2,
-    "emojiBrand": "apple",
-    "messages": [],
+    # Menyusun Payload Final secara Dinamis  
+    payload = {  
+"backgroundColor": color,  
+"width": 512,  
+"height": 768,  
+"scale": 2,  
+"emojiBrand": "apple",  
+"messages": [],
+
 }
-        
-        if cmd and cmd[0].isdigit():
-            payload["scale"] = 2
 
-        # Bangun isi JSON untuk setiap pesan
-        for msg, c_user, r_info in messages_to_quote:
-            msg_json = await build_message_json(msg, custom_user=c_user, reply_info=r_info)
-            payload["messages"].append(msg_json)
+if cmd and cmd[0].isdigit():  
+        payload["scale"] = 2  
 
-        # Eksekusi API & Pengiriman Stiker (Didefinisikan dengan benar)
+    # Bangun isi JSON untuk setiap pesan  
+    for msg, c_user, r_info in messages_to_quote:  
+        msg_json = await build_message_json(msg, custom_user=c_user, reply_info=r_info)  
+        payload["messages"].append(msg_json)  
+
+        # Eksekusi API & Pengiriman Stiker
+        hasil = None
+
         async with aiohttp.ClientSession() as session:
-async with session.post(url, json=payload) as response:
-        # Baris 730: WAJIB beri jarak 4 SPASI lebih menjorok ke kanan dibanding baris 728
-        hasil = await response.json()
-        
-    # Baris 732: Jika ada kode lanjutan di luar blok 'with', sejajarkan dengan 'async with'
-    return hasil
+            async with session.post(url, json=payload) as response:
+                if response.status != 200:
+                    return await pros.edit(
+                        f"{em.gagal}**API Error: {response.status}**"
+                    )
 
-    except Exception as e:
-        # Menangani error jika fungsi gagal
-        print(f"Error pada Quotly: {e}")
+                hasil = await response.read()
 
-        
         if not hasil:
-            return await pros.edit(f"{em.gagal}**Failed to generate quote from API**")
+            return await pros.edit(
+                f"{em.gagal}**Failed to generate quote from API**"
+            )
 
         bio_sticker = BytesIO(hasil)
         bio_sticker.name = "biosticker.webp"
-        
+
         await message.reply_sticker(bio_sticker)
         await pros.delete()
 
     except Exception as e:
         print(f"ERROR: {traceback.format_exc()}")
-        return await pros.edit(f"{em.gagal}{str(e)}")
+        return await pros.edit(f"{em.gagal} {str(e)}")
 
 async def textgen_cmd(client, message):
     em = Emoji(client)
