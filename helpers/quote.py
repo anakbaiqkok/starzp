@@ -300,8 +300,7 @@ class Quotly:
 
         return image
 
-    else:
-        raise QuotlyException(r.json())
+    raise QuotlyException(r.json())
 
     @staticmethod
     async def make_carbonara(
