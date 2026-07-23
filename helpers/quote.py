@@ -281,14 +281,13 @@ class Quotly:
             emoji_status = ""
         return emoji_status
 
-        @staticmethod
+    @staticmethod
     async def quotly(payload: dict) -> bytes:
-        # Gunakan sub-endpoint .png resmi untuk mendapatkan biner gambar langsung
+        # Menggunakan endpoint sub-domain resmi untuk generate gambar biner (.png)
         url = "https://yuri.ly"
         
         async with aiohttp.ClientSession() as session:
             try:
-
                 # Mengirim request menggunakan POST secara eksplisit dengan json body
                 async with session.post(url, json=payload) as resp:
                     if resp.status == 200:
@@ -306,6 +305,7 @@ class Quotly:
                         
             except aiohttp.ClientError as e:
                 raise QuotlyException(f"Gagal terhubung ke API Yuri: {str(e)}")
+
 
 
     @staticmethod
