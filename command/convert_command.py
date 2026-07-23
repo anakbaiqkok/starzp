@@ -1,3 +1,4 @@
+import aiohttp
 import asyncio
 import base64
 import io
@@ -655,7 +656,6 @@ async def qoutly_cmd(client, message):
         messages_to_quote = []
         color = random.choice(Quotly.colors)
         reply_message_info = {}
-        custom_user = None
 
         # Case 1: Teks Perintah Kosong (.q)
         if not cmd:
@@ -691,15 +691,11 @@ async def qoutly_cmd(client, message):
             if count > 10:
                 return await pros.edit(f"{em.gagal}**Max 10 messages**")
 
-            # Ambil riwayat chat mundur dari target pesan yang di-reply
-            # Gunakan list temporary untuk menampung pesan agar urutannya pas kronologis
             history_msgs = []
             async for msg in client.get_chat_history(reply_msg.chat.id, limit=count, offset_id=reply_msg.id):
                 history_msgs.append(msg)
             
-            # Balik urutan riwayat agar pesan terlama diproses duluan
             history_msgs.reverse()
-            # Masukkan pesan target reply di akhir struktur kuotasi
             history_msgs.append(reply_msg)
 
             for msg in history_msgs:
@@ -721,15 +717,18 @@ async def qoutly_cmd(client, message):
         if cmd and cmd[0].isdigit():
             payload["scale"] = 2
 
-        # Bangun isi JSON untuk setiap pesan yang masuk daftar antrean quote
+        # Bangun isi JSON untuk setiap pesan
         for msg, c_user, r_info in messages_to_quote:
             msg_json = await build_message_json(msg, custom_user=c_user, reply_info=r_info)
             payload["messages"].append(msg_json)
 
-        # Eksekusi API & Pengiriman Stiker
+        # Eksekusi API & Pengiriman Stiker (Didefinisikan dengan benar)
         async with aiohttp.ClientSession() as session:
             hasil = await Quotly.quotly(session, payload)
         
+        if not hasil:
+            return await pros.edit(f"{em.gagal}**Failed to generate quote from API**")
+
         bio_sticker = BytesIO(hasil)
         bio_sticker.name = "biosticker.webp"
         
