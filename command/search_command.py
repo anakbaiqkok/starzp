@@ -456,10 +456,18 @@ async def zodiak_cmd(client, message):
         "aquarius",
         "pisces",
     ]
-    if len(message.command) < 2:
-        return await proses.edit(
-            f"{em.gagal}**Please give zodiak name\n\n<code>{', '.join([z.capitalize() for z in ZODIAK_LIST])}</code>**"
-        )
+    if len(teks) > 4096:
+    await proses.delete()
+
+    with open("zodiak.txt", "w", encoding="utf-8") as f:
+        f.write(teks)
+
+        return await message.reply_document(
+        "zodiak.txt",
+        caption="Hasil zodiak terlalu panjang."
+    )
+
+        return await proses.edit(teks)
     try:
         query = message.text.split(None, 1)[1].strip().lower()
     except IndexError:
