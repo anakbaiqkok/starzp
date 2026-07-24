@@ -456,10 +456,9 @@ async def zodiak_cmd(client, message):
         "aquarius",
         "pisces",
     ]
-if len(teks) > MAX_LENGTH:
-    teks = teks[:MAX_LENGTH] + "\n\n...dipotong"
-
-return await proses.edit(teks)
+if len(teks) > 4096:
+    teks = teks[:4096]
+    return await proses.edit(teks)
     try:
         query = message.text.split(None, 1)[1].strip().lower()
     except IndexError:
