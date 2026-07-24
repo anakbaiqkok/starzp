@@ -7,329 +7,82 @@ import aiofiles
 import aiohttp
 from pyrogram.types import InputMediaPhoto
 
+from config import API_BOTCHAX
 from config import API_MAELYN
 from helpers import Bing, Emoji, Tools, animate_proses
 from logs import logger
 
 
-import os
-import shutil
-import traceback
-import uuid
-
-import aiofiles
-import aiohttp
-from pyrogram.types import InputMediaPhoto
-
-from config import API_MAELYN
-from helpers import Bing, Emoji, Tools, animate_proses
-from logs import logger
-
-
-import aiohttp
-import os
-
-from helpers import Emoji, animate_proses
-
-
-BRAT_API = "https://api.siputzx.my.id/api/m/brat"
-
+BOTCHAX_API = "https://api.botcahx.eu.org/api/maker"
 
 async def brat_cmd(client, message):
     em = Emoji(client)
     await em.get()
 
-    text = client.get_text(message)
-
-    if not text:
-        return await message.reply(
-            f"{em.gagal} **Masukkan teks!**\n"
-            "Contoh: `.brat Hello world`"
-        )
-
-    proses = await animate_proses(
-        client,
-        message,
-        "Creating brat..."
-    )
-
-    file = "brat.webp"
-
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                BRAT_API,
-                params={
-                    "text": text,
-                    "delay": 500
-                }
-            ) as resp:
-
-                if resp.status != 200:
-                    return await message.reply(
-                        f"{em.gagal} API Error `{resp.status}`"
-                    )
-
-                data = await resp.read()
-
-                with open(file, "wb") as f:
-                    f.write(data)
-
-
-        await message.reply_sticker(
-            sticker=file
-        )
-
-    except Exception as e:
-        await message.reply(
-            f"{em.gagal} Error:\n`{e}`"
-        )
-
-    finally:
-        if proses:
-            await proses.delete()
-
-        if os.path.exists(file):
-            os.remove(file)
-
-
-async def bingai_cmd(client, message):
-    emo = Emoji(client)
-    await emo.get()
-    prompt = client.get_text(message)
-
-    if not prompt:
-        return await message.reply(
-            f"{emo.gagal}<b>Give the query you want to make!\n\nExample: \n<code>{message.text.split()[0]} Gambarkan lelaki Jepang tampan sedang duduk di bangku, mengenakan hoodie hitam dengan tulisan 'Star only Me' di bagian depan dan kacamata, sambil menghisap rokok dengan sikap santai. Latar belakang menampilkan hutan hujan yang rimbun, dengan cahaya lembut yang menerobos di antara dedaunan, menciptakan suasana tenang dan memikat. Tambahkan efek asap rokok yang melayang di udara, memberikan nuansa misterius pada gambar. Kualitas gambar harus tinggi (4k) dengan detail yang tajam dan warna alami yang kaya || Hindari elemen yang terlalu cerah, ekspresi wajah yang berlebihan, dan latar belakang yang terlalu ramai yang dapat mengalihkan perhatian dari sosok utama.</code></b>"
-        )
-    pros = await message.reply(
-        f"{emo.proses}<b>Proses generate <code>{prompt}</code> ..</b>"
-    )
-    folder_name = f"downloads/{client.me.id}/"
-    try:
-        folder_name, imgs = await Bing.generate_images(folder_name, prompt)
-        if imgs:
-            media_group = []
-            for img in imgs:
-                if os.path.exists(img):
-                    caption = f"{emo.sukses}<b>Successfully generate image:</b>"
-                    media_group.append(InputMediaPhoto(media=img, caption=caption))
-
-            if media_group:
-                await client.send_media_group(
-                    chat_id=message.chat.id,
-                    media=media_group,
-                    reply_to_message_id=message.id,
-                )
-
-            await pros.delete()
-
-            if folder_name:
-                shutil.rmtree(folder_name)
-            for img in imgs:
-                if os.path.exists(img):
-                    os.remove(img)
-        else:
-            return await pros.edit(
-                f"{emo.gagal}<b>Images are not found or failed generate images.</b>"
-            )
-    except Exception as e:
-        error_message = str(e)
-        logger.error(f"Bing error: {traceback.format_exc()}")
-        if "Failed to decode" in error_message:
-            return await pros.edit(
-                f"{emo.gagal}<b>Failed generate image.Please repeat again...</b>"
-            )
-        else:
-            return await pros.edit(
-                f"{emo.gagal}<b>Error:</b>\n <code>{error_message}</code>"
-            )
-    return
-
-
-async def maker_img_cmd(client, message):
-    em = Emoji(client)
-    await em.get()
     if len(message.command) < 2:
-        return await message.reply(
-            f"{em.gagal}**Please give me command and reply to photo!!\nExample: `{message.text.split()[0]} nude` (reply photo).**"
-        )
-    proses = await animate_proses(message, em.proses)
-    reply = message.reply_to_message
-    if message.command[1] == "sertifikat":
-        if len(message.command) < 3:
-            return await proses.edit(
-                f"{em.gagal}**Please give text!!\nExample: `{message.text.split()[0]} sertifikat anak babi`.**"
-            )
-        text = " ".join(message.command[2:])
-        params = {"text": text}
-        url = "https://api.siputzx.my.id/api/m/sertifikat-tolol"
-        response = await Tools.fetch.post(url, json=params)
-        if response.status_code == 200:
-            if not response.content:
-                return await proses.edit(f"{em.gagal}**Please try again.**")
-            file_path = f"sertifikat_{uuid.uuid4().hex}.jpg"
-            with open(file_path, "wb") as f:
-                f.write(response.content)
-            await message.reply_photo(
-                file_path, caption=f"{em.sukses}<b>Succesfully generate image.</b>"
-            )
-            os.remove(file_path)
-            return await proses.delete()
-        else:
-            return await proses.edit(
-                f"{em.gagal}<b>Failed to generate image. Please try again later.</b>"
-            )
-    elif message.command[1] == "xnxx":
-        if len(message.command) < 3:
-            return await proses.edit(
-                f"{em.gagal}**Please give text!!\nExample: `{message.text.split()[0]} xnxx skandal viral`.**"
-            )
-        text = " ".join(message.command[2:])
-        if not message.reply_to_message.media:
-            return await proses.edit(f"{em.gagal}**Please reply photo!!**")
-        media = await reply.download()
-        async with aiofiles.open(media, mode="rb") as file:
-            file_data = await file.read()
-        url = "https://api.siputzx.my.id/api/canvas/xnxx"
+        return await message.reply("**Masukkan teks untuk membuat Brat Image!**")
+
+    teks = " ".join(message.command[1:])
+    if len(teks) > 250:
+        return await message.reply("**Teks terlalu panjang, maksimal 250 karakter!**")
+
+    proses = await message.reply(f"{em.proses} Proses njing.")
+
+    try:
+        url = f"{BOTCHAX_API}/brat"
         async with aiohttp.ClientSession() as session:
-            form = aiohttp.FormData()
-            form.add_field("title", text)
-            form.add_field(
-                "image", file_data, filename="image.jpg", content_type="image/jpeg"
-            )
+            async with session.get(url, params={"text": teks, "apikey": API_BOTCHAX}) as resp:
+                if resp.status == 200:
+                    data = await resp.read()  # ambil bytes langsung
+                    image = io.BytesIO(data)
+                    image.name = f"{uuid4().hex}.jpg"
+                    await client.send_photo(
+                        message.chat.id,
+                        photo=image,
+                        caption=f"**Generated by {client.me.mention}🔥**"
+                    )
+                    await proses.delete()
+                else:
+                    await proses.edit(f"{em.gagal} Gagal ambil gambar dari API.\nStatus: {resp.status}")
 
-            async with session.post(url, data=form) as response:
-                if response.status != 200:
-                    return await proses.edit(f"{em.gagal}**Please try again later!!**")
-                file_path = f"canvas{uuid.uuid4().hex}.jpg"
-                with open(file_path, "wb") as f:
-                    f.write(await response.read())
-                await proses.delete()
-                return await message.reply_photo(file_path)
-    else:
-        return await proses.edit(
-            f"{em.gagal}**Please give me command and reply to photo!!\nExample: `{message.text.split()[0]} nude` (reply photo).**"
-        )
-
-
-async def dalle_cmd(client, message):
-    em = Emoji(client)
-    await em.get()
-    proses = await animate_proses(message, em.proses)
-    prompt = client.get_text(message)
-    if not prompt:
-        return await proses.edit(
-            f"{em.gagal}**Please reply to a message containing the prompt!\n"
-            f"Example: `{message.text.split()[0]} beautiful japanese girl`**"
-        )
-    headers = {"mg-apikey": API_MAELYN}
-    params = {"prompt": prompt, "resolution": "Square"}
-    url = "https://api.maelyn.sbs/api/txt2img/dallexl"
-    response = await Tools.fetch.get(url, headers=headers, params=params)
-    if response.status_code == 200:
-        try:
-            data = response.json()["result"].get("url")
-            img = await Tools.get_media_data(data, "jpg")
-            caption = f"{em.sukses}<b>Successfully generate image.</b>"
-            await message.reply_photo(img, caption=caption)
-            return await proses.delete()
-        except Exception:
-            return await proses.edit(
-                f"{em.gagal}<b>Failed to generate image. Please try again later.</b>"
-            )
-    else:
-        return await proses.edit(
-            f"{em.gagal}<b>Failed to generate image. Please try again later.</b>"
-        )
-
-
-async def startnest_cmd(client, message):
-    em = Emoji(client)
-    await em.get()
-    text = client.get_text(message)
-    if not text:
-        return await message.reply(
-            f"{em.gagal} **Please reply to message text or give message!\nExample: `{message.text.split()[0]} beautiful girl`.**"
-        )
-    pros = await animate_proses(message, em.proses)
-    try:
-        url = f"https://api.maelyn.sbs/api/txt2img/startnest?prompt={text}&apikey={API_MAELYN}"
-        result = await Tools.fetch.get(url)
-        if result.status_code == 200:
-            image = result.json()["result"][0]
-            await message.reply_photo(image)
-            return await pros.delete()
-        else:
-            return await pros.edit(f"{em.gagal}**ERROR:**{result.status_code}")
     except Exception as e:
-        await message.reply(f"{em.gagal}**ERROR:** {str(e)}")
-        return await pros.delete()
+        logger.error(traceback.format_exc())
+        await proses.edit(f"{em.gagal} Error:\n`{e}`")
 
-
-async def remini_cmd(client, message):
+async def brat_video(client, message):
     em = Emoji(client)
     await em.get()
-    prs = await animate_proses(message, em.proses)
-    rep = message.reply_to_message or message
-    if len(message.command) < 2 and not rep:
-        return await prs.edit(f"{em.gagal}**Please reply to image or give link.!!**")
-    if rep and rep.media:
-        arg = await Tools.maelyn_upload(message)
-    else:
-        arg = client.get_text(message)
-        if not arg.startswith("https://"):
-            return await prs.edit(
-                f"{em.gagal}**Please give valid link or reply media**"
-            )
-    url = f"https://api.maelyn.sbs/api/img2img/remini?url={arg}&apikey={API_MAELYN}"
-    respon = await Tools.fetch.get(url)
-    await prs.edit(f"{em.proses}**Scanning of image...**")
-    if respon.status_code == 200:
-        data = respon.json()["result"]
-        try:
-            await prs.delete()
-            url = data.get("url")
-            type = data.get("type")
-            size = data.get("size")
-            expired = data.get("expired")
-            return await message.reply_photo(
-                url,
-                caption=f"{em.sukses}**Type**: {type}\n**Size**: {size}\n**Expired**: {expired}",
-            )
-        except Exception as er:
-            await prs.delete()
-            return await message.reply(f"{em.gagal}**ERROR:** {str(er)}")
-    else:
-        return await prs.edit(f"**{em.gagal}Please try again: {respon.status_code}!**")
 
+    if len(message.command) < 2:
+        return await message.reply("**Masukkan teks untuk membuat Brat Video!**")
 
-async def genai_cmd(client, message):
-    em = Emoji(client)
-    await em.get()
-    proses = await animate_proses(message, em.proses)
-    prompt = client.get_text(message)
-    if not prompt:
-        return await proses.edit(
-            f"{em.gagal}**Please reply to a message containing the prompt!\n"
-            f"Example: `{message.text.split()[0]} beautiful japanese girl`**"
-        )
+    teks = " ".join(message.command[1:])
+    if len(teks) > 250:
+        return await message.reply("**Teks terlalu panjang, maksimal 250 karakter!**")
+
+    proses = await message.reply(f"{em.proses} Proses njing.")
+
     try:
-        url = f"https://api.maelyn.sbs/api/txt2img/realistic?prompt={prompt}&resolution=Portrait&apikey={API_MAELYN}"
-        result = await Tools.fetch.get(url)
-        if result.status_code != 200:
-            return await proses.edit(f"{em.gagal}**Please try again later!!**")
-        data = result.json().get("result", [])
-        if not data:
-            return await proses.edit(f"{em.gagal}**No image found!!**")
-        image = data[0]
-        await message.reply_photo(image)
-        return await proses.delete()
+        url = f"{BOTCHAX_API}/brat-video"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params={"text": teks, "apikey": API_BOTCHAX}) as resp:
+                if resp.status == 200:
+                    data = await resp.read()  # ambil bytes langsung
+                    video = io.BytesIO(data)
+                    video.name = f"{uuid4().hex}.mp4"
+                    await client.send_video(
+                        message.chat.id,
+                        video=video,
+                        caption=f"**Generated by {client.me.mention}🔥**",
+                        supports_streaming=True,
+                    )
+                    await proses.delete()
+                else:
+                    await proses.edit(f"{em.gagal} Gagal ambil video dari API.\nStatus: {resp.status}")
+
     except Exception as e:
-        await message.reply(f"{em.gagal}**ERROR:** {str(e)}")
-        return await proses.delete()
-
-
+        logger.error(traceback.format_exc())
+        await proses.edit(f"{em.gagal} Error:\n`{e}`")
 
 async def bingai_cmd(client, message):
     emo = Emoji(client)
