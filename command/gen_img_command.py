@@ -3,7 +3,6 @@ import io
 import shutil
 import traceback
 import uuid
-import uuid4
 
 import aiofiles
 import aiohttp
@@ -13,7 +12,7 @@ from config import API_BOTCHAX
 from config import API_MAELYN
 from helpers import Bing, Emoji, Tools, animate_proses
 from logs import logger
-
+from uuid import uuid4
 
 BOTCHAX_API = "https://api.botcahx.eu.org/api/maker"
 
