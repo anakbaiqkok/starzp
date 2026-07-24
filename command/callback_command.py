@@ -6,6 +6,7 @@ from gc import get_objects
 
 import requests
 import wget
+from pyrogram import filters
 from pyrogram import enums, raw
 from pyrogram.errors import FloodWait, MessageNotModified
 from pyrogram.helpers import ikb
@@ -90,6 +91,28 @@ async def callback_alert(_, callback_query):
         alert_text = alert_text.replace(r"\n", "\n")
     return await callback_query.answer(text=alert_text, show_alert=True)
 
+async def cancel_task_callback(client, callback_query):
+    task_id = callback_query.matches[0].group(1)
+
+    if not task.is_active(task_id):
+        return await callback_query.answer(
+            "Task sudah tidak berjalan!",
+            show_alert=True
+        )
+
+    task.end_task(task_id)
+
+    await callback_query.answer(
+        "Task berhasil dibatalkan!",
+        show_alert=True
+    )
+
+    try:
+        await callback_query.message.edit(
+            "❌ <b>Broadcast task cancelled.</b>"
+        )
+    except Exception:
+        pass
 
 async def cb_markdown(_, callback_query):
     await callback_query.answer()
