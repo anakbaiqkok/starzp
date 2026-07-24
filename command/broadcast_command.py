@@ -1,6 +1,7 @@
 import asyncio
 import os
 
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums import ChatType
 from pyrogram.errors import (ChannelPrivate,
                              ChatWriteForbidden, FloodWait,
@@ -32,6 +33,16 @@ async def bc_cmd(client, message):
     await proses.edit(
         f"{em.proses}<i>Task broadcast running #<code>{task_id}</code>. "
         f"Type <code>{prefix[0]}cancel {task_id}</code> to cancel broadcast!</i>"
+        reply_markup=InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "❌ Cancel Task",
+                    callback_data=f"cancel_task_{task_id}"
+                )
+            ]
+        ]
+    )
     )
     peer = client._get_my_peer.get(client.me.id)
     if not peer:
@@ -177,6 +188,16 @@ async def gcast_cmd(client, message):
     await proses.edit(
         f"{em.proses}<i>Task {message.command[0]} running #<code>{task_id}</code>. "
         f"Type <code>{prefix[0]}cancel {task_id}</code> to cancel {message.command[0]}!</i>"
+        reply_markup=InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "❌ Cancel Task",
+                    callback_data=f"cancel_task_{task_id}"
+                )
+            ]
+        ]
+    )
     )
     peer = client._get_my_peer.get(client.me.id)
     if not peer:
@@ -310,6 +331,16 @@ async def ucast_cmd(client, message):
     await proses.edit(
         f"{em.proses}<i>Task {message.command[0]} running #<code>{task_id}</code>. "
         f"Type <code>{prefix[0]}cancel {task_id}</code> to cancel {message.command[0]}!</i>"
+        reply_markup=InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "❌ Cancel Task",
+                    callback_data=f"cancel_task_{task_id}"
+                )
+            ]
+        ]
+    )
     )
     peer = client._get_my_peer.get(client.me.id)
     if not peer:
