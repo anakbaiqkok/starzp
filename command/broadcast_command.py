@@ -1,13 +1,13 @@
 import asyncio
 import os
 
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums import ChatType
 from pyrogram.errors import (ChannelPrivate,
                              ChatWriteForbidden, FloodWait,
                              Forbidden, NotAcceptable, PeerFlood,
                              PeerIdInvalid, SlowmodeWait, UserBannedInChannel)
 
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from clients import bot
 from config import BLACKLIST_GCAST, DEVS
 from database import dB, state
@@ -33,16 +33,6 @@ async def bc_cmd(client, message):
     await proses.edit(
         f"{em.proses}<i>Task broadcast running #<code>{task_id}</code>. "
         f"Type <code>{prefix[0]}cancel {task_id}</code> to cancel broadcast!</i>"
-        reply_markup=InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton(
-                    "❌ Cancel Task",
-                    callback_data=f"cancel_task_{task_id}"
-                )
-            ]
-        ]
-    )
     )
     peer = client._get_my_peer.get(client.me.id)
     if not peer:
@@ -186,9 +176,8 @@ async def gcast_cmd(client, message):
     task_id = task.start_task()
     prefix = client.get_prefix(client.me.id)
     await proses.edit(
-        f"{em.proses}<i>Task {message.command[0]} running #<code>{task_id}</code>. "
-        f"Type <code>{prefix[0]}cancel {task_id}</code> to cancel {message.command[0]}!</i>"
-        reply_markup=InlineKeyboardMarkup(
+    f"{em.proses}<i>Task broadcast running #<code>{task_id}</code></i>",
+    reply_markup=InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
@@ -198,7 +187,7 @@ async def gcast_cmd(client, message):
             ]
         ]
     )
-    )
+)
     peer = client._get_my_peer.get(client.me.id)
     if not peer:
         chats = await client.get_chat_id("group")
@@ -329,9 +318,8 @@ async def ucast_cmd(client, message):
     task_id = task.start_task()
     prefix = client.get_prefix(client.me.id)
     await proses.edit(
-        f"{em.proses}<i>Task {message.command[0]} running #<code>{task_id}</code>. "
-        f"Type <code>{prefix[0]}cancel {task_id}</code> to cancel {message.command[0]}!</i>"
-        reply_markup=InlineKeyboardMarkup(
+    f"{em.proses}<i>Task broadcast running #<code>{task_id}</code></i>",
+    reply_markup=InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
@@ -341,7 +329,7 @@ async def ucast_cmd(client, message):
             ]
         ]
     )
-    )
+)
     peer = client._get_my_peer.get(client.me.id)
     if not peer:
         chats = await client.get_chat_id("private")
@@ -888,9 +876,18 @@ async def spamg_cmd(client, message):
     task_id = task.start_task()
     prefix = client.get_prefix(client.me.id)
     await proses.edit(
-        f"{emo.proses}<i>Spam broadcast task running #<code>{task_id}</code>. "
-        f"Type <code>{prefix[0]}cancel {task_id}</code> to cancel Spam broadcast!</i>"
+    f"{em.proses}<i>Task broadcast running #<code>{task_id}</code></i>",
+    reply_markup=InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "❌ Cancel Task",
+                    callback_data=f"cancel_task_{task_id}"
+                )
+            ]
+        ]
     )
+)
     chats = await client.get_chat_id("group")
     blacklist = await dB.get_list_from_var(client.me.id, "BLACKLIST_GCAST")
     done = 0
